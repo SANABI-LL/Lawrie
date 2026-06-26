@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lawrie · 像素萝卜兔桌宠 · 状态总览</title>
+<style>
+  :root { --bg:#161C2B; --card:#20283A; --line:#2E3850; --text:#E8ECF5; --sub:#8C9BC0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, system-ui, "Segoe UI", sans-serif; }
+  header { text-align: center; padding: 40px 20px 8px; }
+  header h1 { margin: 0; font-size: 28px; letter-spacing: 1px; }
+  header p { margin: 8px 0 0; color: var(--sub); font-size: 14px; }
+  .grid { max-width: 1100px; margin: 24px auto 60px; padding: 0 20px;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    overflow: hidden; }
+  .card iframe { width: 100%; aspect-ratio: 1; border: 0; display: block; }
+  .meta { padding: 12px 14px; border-top: 1px solid var(--line); }
+  .meta .name { font-weight: 600; font-size: 15px; }
+  .meta .desc { color: var(--sub); font-size: 12.5px; margin-top: 3px; line-height: 1.5; }
+  footer { text-align: center; color: var(--sub); font-size: 12.5px; padding: 0 20px 50px; }
+  a { color: #8FB8FF; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Lawrie · 像素萝卜兔 🐰🥕</h1>
+    <p>一只爱萝卜的像素桌宠 · 状态动效总览（已完成 6 个状态）</p>
+  </header>
+
+  <div class="grid" id="grid"></div>
+
+  <footer>
+    每个格子是一个自包含的 <code>.svg.html</code>，浏览器里实时跑。<br>
+    用 Claude Code + pet-forge 制作 · <a href="https://github.com/SANABI-LL/Lawrie">源码仓库</a>
+  </footer>
+
+  <script>
+    const states = [
+      ["rabbit-idle.svg.html",        "idle 待机",     "呼吸 + 眨眼 + 偶尔掏萝卜吃"],
+      ["rabbit-typing.svg.html",      "typing 打字",   "笔记本背面 + 眼球扫 + “da” 飘"],
+      ["rabbit-thinking-v2.svg.html", "thinking 思考", "眼上瞟 + “...” + 灵光一现灯泡亮"],
+      ["rabbit-sleeping.svg.html",    "sleeping 睡觉", "趴睡 + 舔嘴 + 萝卜梦境泡泡"],
+      ["rabbit-happy.svg.html",       "happy 开心",    "蹦跳欢呼 + 举手 + 星星"],
+      ["rabbit-error-v2.svg.html",    "error 出错",    "XX 晕眼 + 金星绕头 + glitch 错位"],
+    ];
+    const grid = document.getElementById("grid");
+    for (const [file, name, desc] of states) {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML =
+        '<iframe loading="lazy" src="' + file + '" title="' + name + '"></iframe>' +
+        '<div class="meta"><div class="name">' + name + '</div>' +
+        '<div class="desc">' + desc + '</div></div>';
+      grid.appendChild(card);
+    }
+  </script>
+</body>
+</html>

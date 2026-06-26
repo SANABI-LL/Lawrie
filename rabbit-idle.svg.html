@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:,">
+<title>my-pet · 像素兔 · idle</title>
+<style>
+  /*
+    像素兔桌宠 · idle 状态（A 类：循环，首=尾）
+    ─────────────────────────────────────────────
+    pixel-art preset：整像素、硬边、纯色块、跳帧动画。
+    造型 = 下面 SPRITE 字符图谱（改图谱即改造型）。
+    彩蛋（B 类，偶发回归）：从口袋掏胡萝卜 → 咬两口 → 放回。
+    全程不渐变、不圆角、不缓动 —— 像素风铁律。
+  */
+
+  :root {
+    --idle-period: 1.1s;       /* idle 循环周期（像素风短一档 1-2s） */
+    --blink-min-gap: 2000;
+    --blink-max-gap: 5000;
+    --blink-frame: 110;        /* 单帧眨眼时长 ms（瞬切，不缓动） */
+    --carrot-min-gap: 9000;    /* 掏胡萝卜彩蛋最小间隔 ms */
+    --carrot-max-gap: 16000;
+    --pixel-size: 360px;
+    --bg: #20283A;
+  }
+
+  html, body { margin: 0; min-height: 100vh; background: var(--bg); }
+  body { display: grid; min-height: 100vh; place-items: center;
+         font-family: "VT323", "Press Start 2P", ui-monospace, monospace; }
+
+  /* 像素风核心：关抗锯齿 + 放大不重采样 */
+  #stage {
+    width: var(--pixel-size); height: var(--pixel-size);
+    image-rendering: pixelated; shape-rendering: crispEdges; display: block;
+  }
+
+  /* idle bob：整 1 像素跳，平段保持 = 无缓动跳帧 */
+  #pet { animation: idleBob var(--idle-period) infinite; }
+  @keyframes idleBob {
+    0%, 49.9%  { transform: translateY(0); }
+    50%, 99.9% { transform: translateY(-1px); }   /* -1px = 1 个 sprite 像素 */
+  }
+
+  /* 彩蛋里胡萝卜的"举起/放回"用整像素位移，瞬切不缓动 */
+  #carrotEat { transition: none; }
+
+  #hint { position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+          font-size: 16px; color: #6E7DA8; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+
+<div id="hint">my-pet · 像素兔 · idle（等几秒看它掏胡萝卜）</div>
+
+<svg id="stage" viewBox="0 0 28 28" role="img" aria-label="一只会跳动眨眼、偶尔从口袋掏胡萝卜吃的像素兔" xmlns="http://www.w3.org/2000/svg">
+  <!-- 地面阴影：静态，不随兔子 bob -->
+  <rect id="shadow" x="8" y="27" width="12" height="1" fill="#000000" opacity="0.16"/>
+
+  <g id="pet">
+    <g id="ears"></g>          <!-- JS：图谱前 8 行（耳朵），可慵懒一抖 -->
+
+    <g id="body"></g>          <!-- JS：其余像素 -->
+
+    <!-- 胡萝卜缨子：平时从口袋露出来（伏笔） -->
+    <g id="carrotRest">
+      <rect x="13" y="18" width="1" height="1" fill="#7FBF4F"/>
+      <rect x="12" y="19" width="1" height="1" fill="#4E8A33"/>
+      <rect x="13" y="19" width="1" height="1" fill="#7FBF4F"/>
+      <rect x="14" y="19" width="1" height="1" fill="#4E8A33"/>
+    </g>
+
+    <!-- 口袋前片：缝在肚皮上，盖住胡萝卜身体，只露缨子 -->
+    <g id="pocketFlap">
+      <rect x="11" y="20" width="6" height="1" fill="#5A4A3F"/>
+      <rect x="11" y="21" width="1" height="2" fill="#5A4A3F"/>
+      <rect x="16" y="21" width="1" height="2" fill="#5A4A3F"/>
+      <rect x="12" y="21" width="4" height="2" fill="#EADBC6"/>
+    </g>
+
+    <!-- 彩蛋：举到嘴边的整根胡萝卜（默认隐藏，JS 控制分帧） -->
+    <g id="carrotEat" style="display:none">
+      <g id="carrotTop">
+        <!-- 缨子 -->
+        <rect x="15" y="14" width="1" height="1" fill="#7FBF4F"/>
+        <rect x="14" y="15" width="1" height="1" fill="#4E8A33"/>
+        <rect x="15" y="15" width="1" height="1" fill="#7FBF4F"/>
+        <rect x="16" y="15" width="1" height="1" fill="#4E8A33"/>
+        <!-- 胡萝卜顶段 -->
+        <rect x="14" y="16" width="1" height="1" fill="#C96A22"/>
+        <rect x="15" y="16" width="1" height="1" fill="#F0913C"/>
+        <rect x="16" y="16" width="1" height="1" fill="#C96A22"/>
+        <!-- 抓着的爪子 -->
+        <rect x="13" y="16" width="1" height="1" fill="#F5EFE4"/>
+        <rect x="13" y="17" width="1" height="1" fill="#F5EFE4"/>
+        <rect x="12" y="17" width="1" height="1" fill="#5A4A3F"/>
+      </g>
+      <!-- 第二口吃掉 -->
+      <g id="carrotSeg2">
+        <rect x="14" y="17" width="1" height="1" fill="#C96A22"/>
+        <rect x="15" y="17" width="1" height="1" fill="#F0913C"/>
+        <rect x="16" y="17" width="1" height="1" fill="#C96A22"/>
+      </g>
+      <!-- 第一口吃掉（尖端先没） -->
+      <g id="carrotSeg1">
+        <rect x="15" y="18" width="1" height="1" fill="#F0913C"/>
+        <rect x="16" y="18" width="1" height="1" fill="#C96A22"/>
+        <rect x="15" y="19" width="1" height="1" fill="#C96A22"/>
+      </g>
+    </g>
+
+    <!-- 眼睛：单独画，眨眼整帧替换 -->
+    <g id="eyesOpen">
+      <rect x="10" y="12" width="1" height="1" fill="#FFFFFF"/>
+      <rect x="11" y="12" width="1" height="1" fill="#37291F"/>
+      <rect x="10" y="13" width="1" height="1" fill="#37291F"/>
+      <rect x="11" y="13" width="1" height="1" fill="#37291F"/>
+      <rect x="16" y="12" width="1" height="1" fill="#FFFFFF"/>
+      <rect x="17" y="12" width="1" height="1" fill="#37291F"/>
+      <rect x="16" y="13" width="1" height="1" fill="#37291F"/>
+      <rect x="17" y="13" width="1" height="1" fill="#37291F"/>
+    </g>
+    <g id="eyesClosed" style="display:none">
+      <rect x="10" y="13" width="2" height="1" fill="#37291F"/>
+      <rect x="16" y="13" width="2" height="1" fill="#37291F"/>
+    </g>
+  </g>
+</svg>
+
+<script>
+  /* ─── 像素图谱：每字符 = 一个像素，改这里就改造型 ───
+     .=透明  O=描边  W=毛色  B=肚皮(更浅)  P=粉(内耳/鼻/腮红)
+     眼睛/口袋/胡萝卜不在图谱里，单独画。 28×28。 */
+  const SPRITE = [
+    "............................",
+    "........OWWWO..OWWWO........",
+    "........OWPWO..OWPWO........",
+    "........OWPWO..OWPWO........",
+    "........OWPWO..OWPWO........",
+    "........OWPWO..OWPWO........",
+    "........OWWWO..OWWWO........",
+    "........OWWWO..OWWWO........",
+    "......OOWWWWWWWWWWWWOO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWPPWWWWWWO......",
+    "......OWPWWWWWWWWWWPWO......",
+    "......OOWWWWWWWWWWWWOO......",
+    "......OOWWWWWWWWWWWWOO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWBBBBBBBBWWWO......",
+    "......OWWWBBBBBBBBWWWO......",
+    "......OWWWBBBBBBBBWWWO......",
+    "......OWWWWBBBBBBWWWWO......",
+    "......OOWWWWWWWWWWWWOO......",
+    "........OWWWO..OWWWO........",
+    "........OWWWO..OWWWO........",
+    "........OOOOO..OOOOO........",
+    "............................"
+  ];
+  const PALETTE = { O:"#5A4A3F", W:"#F5EFE4", B:"#FFFBF4", P:"#F4A7B6" };
+
+  const SVGNS = "http://www.w3.org/2000/svg";
+  const earsG = document.getElementById("ears");
+  const bodyG = document.getElementById("body");
+
+  SPRITE.forEach((row, y) => {
+    for (let x = 0; x < row.length; x++) {
+      const c = row[x];
+      if (c === "." || !PALETTE[c]) continue;
+      const r = document.createElementNS(SVGNS, "rect");
+      r.setAttribute("x", x); r.setAttribute("y", y);
+      r.setAttribute("width", 1); r.setAttribute("height", 1);
+      r.setAttribute("fill", PALETTE[c]);
+      (y < 8 ? earsG : bodyG).appendChild(r);
+    }
+  });
+
+  const root = getComputedStyle(document.documentElement);
+  const num = k => parseInt(root.getPropertyValue(k));
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  // ── 眨眼：整帧替换 ──
+  const eyesOpen = document.getElementById("eyesOpen");
+  const eyesClosed = document.getElementById("eyesClosed");
+  function blink() {
+    eyesOpen.style.display = "none"; eyesClosed.style.display = "";
+    setTimeout(() => { eyesClosed.style.display = "none"; eyesOpen.style.display = ""; }, num("--blink-frame"));
+  }
+  (function scheduleBlink() {
+    const gap = num("--blink-min-gap") + Math.random() * (num("--blink-max-gap") - num("--blink-min-gap"));
+    setTimeout(() => { blink(); scheduleBlink(); }, gap);
+  })();
+
+  // ── 耳朵抽搐 / 尾巴抖动：偶尔整体横移 1 像素，弹回 ──
+  function earFlick(ms) {
+    earsG.style.transform = "translateY(1px)";   // 耷拉耳朵慵懒一抖（整像素，瞬切）
+    setTimeout(() => { earsG.style.transform = ""; }, ms);
+  }
+  (function scheduleEar() {
+    setTimeout(() => { earFlick(160); scheduleEar(); }, 3500 + Math.random() * 4500);
+  })();
+
+  // ── 彩蛋：从口袋掏胡萝卜 → 咬两口 → 放回（B 类，偶发回归）──
+  const carrotRest = document.getElementById("carrotRest");
+  const carrotEat  = document.getElementById("carrotEat");
+  const seg1 = document.getElementById("carrotSeg1");
+  const seg2 = document.getElementById("carrotSeg2");
+  let busy = false;
+
+  async function eatCarrot() {
+    if (busy) return; busy = true;
+    seg1.style.display = ""; seg2.style.display = "";   // 整根
+    carrotRest.style.display = "none";
+    carrotEat.style.display = "";
+
+    // 举起：3 步整像素跳，从口袋到嘴边
+    carrotEat.style.transform = "translateY(4px)"; await sleep(110);
+    carrotEat.style.transform = "translateY(2px)"; await sleep(110);
+    carrotEat.style.transform = "translateY(0)";   await sleep(200);
+
+    // 第一口（尖端没）：1px 咬合下顿 + 整帧去段
+    carrotEat.style.transform = "translateY(1px)"; await sleep(90);
+    seg1.style.display = "none";
+    carrotEat.style.transform = "translateY(0)";   await sleep(330);
+
+    // 第二口
+    carrotEat.style.transform = "translateY(1px)"; await sleep(90);
+    seg2.style.display = "none";
+    carrotEat.style.transform = "translateY(0)";   await sleep(330);
+    await sleep(160);
+
+    // 放回口袋：恢复整根，3 步落回
+    seg1.style.display = ""; seg2.style.display = "";
+    carrotEat.style.transform = "translateY(2px)"; await sleep(110);
+    carrotEat.style.transform = "translateY(4px)"; await sleep(110);
+    carrotEat.style.display = "none";
+    carrotEat.style.transform = "";
+    carrotRest.style.display = "";
+    busy = false;
+  }
+  (function scheduleCarrot() {
+    const gap = num("--carrot-min-gap") + Math.random() * (num("--carrot-max-gap") - num("--carrot-min-gap"));
+    setTimeout(async () => { await eatCarrot(); scheduleCarrot(); }, gap);
+  })();
+</script>
+
+</body>
+</html>

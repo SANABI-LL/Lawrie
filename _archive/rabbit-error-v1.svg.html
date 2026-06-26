@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:,">
+<title>my-pet · 像素兔 · error</title>
+<style>
+  /*
+    像素兔桌宠 · error 状态（出错晕倒，A 类循环）
+    ─────────────────────────────────────────────
+    复用站立兔图谱，叠加晕倒表现：
+      · XX 晕眼 + 小呆嘴 + 冷汗（收敛，不夸张）
+      · 头顶金星转圈 —— 关键：转到头/耳后被【头顶重画层】遮挡，转到前面露出来，有立体绕圈感
+      · 身体晕乎乎左右摇晃
+    整像素、硬边、跳帧。
+  */
+  :root { --pixel-size: 360px; --bg: #20283A; }
+  html, body { margin: 0; min-height: 100vh; background: var(--bg); }
+  body { display: grid; min-height: 100vh; place-items: center;
+         font-family: "VT323", ui-monospace, monospace; }
+  #stage { width: var(--pixel-size); height: var(--pixel-size);
+           image-rendering: pixelated; shape-rendering: crispEdges; display: block; }
+
+  /* 整场景晕乎乎左右摇晃（兔子+星星+遮挡层一起，保持对齐） */
+  #scene { transform-box: fill-box; transform-origin: center bottom;
+           animation: sway 1.4s ease-in-out infinite; }
+  @keyframes sway { 0%,100%{transform:translateX(-1px)} 50%{transform:translateX(1px)} }
+
+  /* 金星绕头椭圆轨道（中心 13,9 · rx7 · ry2.5）。3 颗错相 */
+  .star { animation: orbit 1.5s linear infinite; }
+  #s2 { animation-delay: -0.5s; }
+  #s3 { animation-delay: -1s; }
+  @keyframes orbit {
+    0%    { transform: translate(20px, 9px); }
+    12.5% { transform: translate(18px, 11px); }
+    25%   { transform: translate(13px, 11px); }
+    37.5% { transform: translate(8px,  11px); }
+    50%   { transform: translate(6px,  9px); }
+    62.5% { transform: translate(8px,  7px); }
+    75%   { transform: translate(13px, 7px); }
+    87.5% { transform: translate(18px, 7px); }
+    100%  { transform: translate(20px, 9px); }
+  }
+
+  #hint { position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+          font-size: 16px; color: #6E7DA8; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+
+<div id="hint">my-pet · 像素兔 · error（晕了…）</div>
+
+<svg id="stage" viewBox="0 0 28 28" role="img" aria-label="一只出错晕倒、头顶金星绕圈的像素兔桌宠" xmlns="http://www.w3.org/2000/svg">
+  <rect id="shadow" x="8" y="26" width="12" height="1" fill="#000000" opacity="0.2"/>
+
+  <g id="scene">
+    <!-- 兔子本体 + 脸 + 口袋 -->
+    <g id="body"></g>
+    <g id="face">
+      <!-- XX 晕眼 -->
+      <rect x="10" y="12" width="1" height="1" fill="#3C2E28"/><rect x="12" y="12" width="1" height="1" fill="#3C2E28"/><rect x="11" y="13" width="1" height="1" fill="#3C2E28"/><rect x="10" y="14" width="1" height="1" fill="#3C2E28"/><rect x="12" y="14" width="1" height="1" fill="#3C2E28"/>
+      <rect x="15" y="12" width="1" height="1" fill="#3C2E28"/><rect x="17" y="12" width="1" height="1" fill="#3C2E28"/><rect x="16" y="13" width="1" height="1" fill="#3C2E28"/><rect x="15" y="14" width="1" height="1" fill="#3C2E28"/><rect x="17" y="14" width="1" height="1" fill="#3C2E28"/>
+      <!-- 小呆嘴 -->
+      <rect x="13" y="17" width="2" height="1" fill="#3C2E28"/>
+      <!-- 冷汗 + 腮红 -->
+      <rect x="19" y="12" width="1" height="1" fill="#96CDE6"/><rect x="19" y="13" width="1" height="1" fill="#96CDE6"/>
+      <rect x="8"  y="15" width="1" height="1" fill="#F48C96"/><rect x="19" y="16" width="1" height="1" fill="#F48C96"/>
+    </g>
+    <g id="pocket">
+      <rect x="13" y="20" width="1" height="1" fill="#7FBF4F"/><rect x="14" y="20" width="1" height="1" fill="#4E8A33"/>
+      <rect x="11" y="21" width="1" height="1" fill="#5A4A3F"/><rect x="12" y="21" width="4" height="1" fill="#EADBC6"/><rect x="16" y="21" width="1" height="1" fill="#5A4A3F"/>
+      <rect x="11" y="22" width="1" height="1" fill="#5A4A3F"/><rect x="12" y="22" width="4" height="1" fill="#EADBC6"/><rect x="16" y="22" width="1" height="1" fill="#5A4A3F"/>
+    </g>
+
+    <!-- 金星（在身体前面，但会被下面的"头顶重画层"遮挡） -->
+    <g id="stars">
+      <g class="star" id="s1">
+        <rect x="0" y="-1" width="1" height="1" fill="#E0AA28"/><rect x="-1" y="0" width="1" height="1" fill="#E0AA28"/><rect x="0" y="0" width="1" height="1" fill="#FFF4C2"/><rect x="1" y="0" width="1" height="1" fill="#E0AA28"/><rect x="0" y="1" width="1" height="1" fill="#E0AA28"/>
+      </g>
+      <g class="star" id="s2">
+        <rect x="0" y="-1" width="1" height="1" fill="#FFE48A"/><rect x="-1" y="0" width="1" height="1" fill="#FFE48A"/><rect x="0" y="0" width="1" height="1" fill="#FFF4C2"/><rect x="1" y="0" width="1" height="1" fill="#FFE48A"/><rect x="0" y="1" width="1" height="1" fill="#FFE48A"/>
+      </g>
+      <g class="star" id="s3">
+        <rect x="0" y="-1" width="1" height="1" fill="#E0AA28"/><rect x="-1" y="0" width="1" height="1" fill="#E0AA28"/><rect x="0" y="0" width="1" height="1" fill="#FFF4C2"/><rect x="1" y="0" width="1" height="1" fill="#E0AA28"/><rect x="0" y="1" width="1" height="1" fill="#E0AA28"/>
+      </g>
+    </g>
+
+    <!-- 头顶重画层：耳朵 + 头顶（图谱 3-10 行），盖在星星前面 → 星星转到头后时被遮挡 -->
+    <g id="headTop"></g>
+  </g>
+</svg>
+
+<script>
+  const ERROR_SPRITE = [
+    "............................",
+    "............................",
+    "............................",
+    "........OWWWO..OWWWO........",
+    "........OWPWO..OWPWO........",
+    "........OWPWO..OWPWO........",
+    "........OWPWO..OWPWO........",
+    "........OWPWO..OWPWO........",
+    "........OWWWO..OWWWO........",
+    "........OWWWO..OWWWO........",
+    "......OOWWWWWWWWWWWWOO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OOWWWWWWWWWWWWOO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWBBBBBBBBWWWO......",
+    "......OWWWWBBBBBBWWWWO......",
+    "......OOWWWWWWWWWWWWOO......",
+    "........OWWWO..OWWWO........",
+    "........OOOOO..OOOOO........",
+    "............................",
+    "............................"
+  ];
+  const PALETTE = { O:"#5A4A3F", W:"#F5EFE4", P:"#F4A7B6", B:"#FFFBF4" };
+  const SVGNS = "http://www.w3.org/2000/svg";
+  function paint(group, y0, y1) {
+    ERROR_SPRITE.forEach((row, y) => {
+      if (y < y0 || y > y1) return;
+      for (let x = 0; x < row.length; x++) {
+        const c = row[x];
+        if (c === "." || !PALETTE[c]) continue;
+        const r = document.createElementNS(SVGNS, "rect");
+        r.setAttribute("x", x); r.setAttribute("y", y);
+        r.setAttribute("width", 1); r.setAttribute("height", 1);
+        r.setAttribute("fill", PALETTE[c]);
+        group.appendChild(r);
+      }
+    });
+  }
+  paint(document.getElementById("body"), 0, 27);        // 全身
+  paint(document.getElementById("headTop"), 3, 10);     // 耳朵+头顶，盖在星星前面做遮挡
+</script>
+
+</body>
+</html>

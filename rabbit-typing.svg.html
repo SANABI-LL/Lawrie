@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:,">
+<title>my-pet · 像素兔 · typing</title>
+<style>
+  /*
+    像素兔桌宠 · typing 状态（A 类：循环，首=尾）
+    ─────────────────────────────────────────────
+    复用 idle 的同一套像素兔图谱（SPRITE/PALETTE）。
+    正确朝向：兔子是用户，看到的是【笔记本背面】，键盘上的手看不见 → 不画。
+      · 正常大小眼睛 + 高光左右扫（读屏幕）
+      · "da da da" 像烟一样慢慢上飘渐淡，模拟打字声
+      · 旁边一根胡萝卜，偶尔伸手拿起来咬一口再放回（B 类彩蛋，手只在此时出现）
+      · 下巴屏幕光会闪
+    全程整像素、硬边、跳帧，不缓动。
+  */
+
+  :root {
+    --blink-min-gap: 2200;
+    --blink-max-gap: 5000;
+    --blink-frame: 110;
+    --carrot-min-gap: 9000;
+    --carrot-max-gap: 15000;
+    --pixel-size: 360px;
+    --bg: #20283A;
+  }
+
+  html, body { margin: 0; min-height: 100vh; background: var(--bg); }
+  body { display: grid; min-height: 100vh; place-items: center;
+         font-family: "VT323", "Press Start 2P", ui-monospace, monospace; }
+
+  #stage {
+    width: var(--pixel-size); height: var(--pixel-size);
+    image-rendering: pixelated; shape-rendering: crispEdges; display: block;
+  }
+
+  /* 眼球左右扫：正常眼，高光在左右两像素间挪 */
+  #shine { animation: scan 2.4s infinite; }
+  @keyframes scan {
+    0%, 30%  { transform: translateX(0); }
+    50%, 80% { transform: translateX(1px); }
+    100%     { transform: translateX(0); }
+  }
+
+  /* 屏幕光：硬闪 */
+  .glow { animation: glowFlick 0.8s infinite; }
+  @keyframes glowFlick {
+    0%, 64.9%  { opacity: 0.6; }
+    65%, 99.9% { opacity: 0.3; }
+  }
+
+  /* 打字拟声词：像烟一样慢慢上飘、轻轻偏移、渐淡 */
+  .snd { font-family: "VT323", "Press Start 2P", ui-monospace, monospace;
+         font-size: 3.4px; font-weight: bold; fill: #AFC9E0; opacity: 0; }
+  .snd.riseL { animation: riseL 1.9s ease-out forwards; }
+  .snd.riseR { animation: riseR 1.9s ease-out forwards; }
+  @keyframes riseL {
+    0%   { opacity: 0;    transform: translate(0, 0); }
+    14%  { opacity: 0.9;  }
+    100% { opacity: 0;    transform: translate(-2px, -9px); }
+  }
+  @keyframes riseR {
+    0%   { opacity: 0;    transform: translate(0, 0); }
+    14%  { opacity: 0.9;  }
+    100% { opacity: 0;    transform: translate(2px, -9px); }
+  }
+
+  #hint { position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+          font-size: 16px; color: #6E7DA8; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+
+<div id="hint">my-pet · 像素兔 · typing</div>
+
+<svg id="stage" viewBox="0 0 28 28" role="img" aria-label="一只在笔记本前打字的像素兔，旁边有胡萝卜会偶尔吃一口" xmlns="http://www.w3.org/2000/svg">
+  <!-- 地面阴影 -->
+  <rect id="shadow" x="4" y="26" width="22" height="1" fill="#000000" opacity="0.18"/>
+
+  <!-- 兔子本体：从笔记本背板上方探头，复用 idle 图谱 -->
+  <g id="rabbit">
+    <g id="ears"></g>
+    <g id="body"></g>
+
+    <!-- 眼睛：正常大小黑眼 + 会左右挪的高光（眼球扫视） -->
+    <g id="eyesOpen">
+      <rect x="10" y="12" width="2" height="2" fill="#37291F"/>
+      <rect x="16" y="12" width="2" height="2" fill="#37291F"/>
+      <g id="shine">
+        <rect x="10" y="12" width="1" height="1" fill="#FFFFFF"/>
+        <rect x="16" y="12" width="1" height="1" fill="#FFFFFF"/>
+      </g>
+    </g>
+    <g id="eyesClosed" style="display:none">
+      <rect x="10" y="13" width="2" height="1" fill="#37291F"/>
+      <rect x="16" y="13" width="2" height="1" fill="#37291F"/>
+    </g>
+
+    <!-- 小嘴 -->
+    <rect x="13" y="15" width="2" height="1" fill="#5A4A3F"/>
+
+    <!-- 屏幕光照在下巴上（会闪） -->
+    <g class="glow">
+      <rect x="8" y="16" width="12" height="1" fill="#9FE8FF"/>
+    </g>
+  </g>
+
+  <!-- 笔记本：背面朝向观众 -->
+  <g id="laptop">
+    <rect x="6"  y="17" width="16" height="1" fill="#3A4360"/>
+    <rect x="6"  y="18" width="1"  height="5" fill="#3A4360"/>
+    <rect x="21" y="18" width="1"  height="5" fill="#3A4360"/>
+    <rect x="6"  y="23" width="16" height="1" fill="#3A4360"/>
+    <rect x="7"  y="18" width="14" height="5" fill="#8A93B0"/>
+    <rect x="7"  y="18" width="14" height="2" fill="#A7AFC8"/>
+    <rect x="13" y="20" width="2" height="2" fill="#9FE8FF"/>   <!-- 发光 logo -->
+    <rect x="5"  y="24" width="18" height="1" fill="#AEB6CE"/>  <!-- 底座前缘 -->
+    <rect x="5"  y="25" width="18" height="1" fill="#4A5270"/>
+  </g>
+
+  <!-- 旁边的胡萝卜：斜躺在桌上（尖端左下、缨子右上；吃的时候隐藏） -->
+  <g id="carrotDesk">
+    <!-- 缨子（右上） -->
+    <rect x="25" y="21" width="1" height="1" fill="#7FBF4F"/>
+    <rect x="26" y="20" width="1" height="1" fill="#4E8A33"/><rect x="26" y="21" width="1" height="1" fill="#7FBF4F"/>
+    <!-- 萝卜身（斜对角，2 像素粗，下缘偏深当受光阴影） -->
+    <rect x="24" y="22" width="1" height="1" fill="#F0913C"/><rect x="25" y="22" width="1" height="1" fill="#F0913C"/>
+    <rect x="23" y="23" width="1" height="1" fill="#F0913C"/><rect x="24" y="23" width="1" height="1" fill="#F0913C"/><rect x="25" y="23" width="1" height="1" fill="#C96A22"/>
+    <rect x="22" y="24" width="1" height="1" fill="#F0913C"/><rect x="23" y="24" width="1" height="1" fill="#F0913C"/><rect x="24" y="24" width="1" height="1" fill="#C96A22"/>
+    <!-- 尖端（左下，搭在桌上） -->
+    <rect x="21" y="25" width="1" height="1" fill="#C96A22"/><rect x="22" y="25" width="1" height="1" fill="#C96A22"/><rect x="23" y="25" width="1" height="1" fill="#C96A22"/>
+  </g>
+
+  <!-- 拿到嘴边的胡萝卜（默认隐藏，JS 控制：从桌上拿起 → 咬两口 → 放回） -->
+  <g id="carrotEat" style="display:none">
+    <g id="carrotTop">
+      <rect x="15" y="14" width="1" height="1" fill="#7FBF4F"/>
+      <rect x="14" y="15" width="1" height="1" fill="#C96A22"/><rect x="15" y="15" width="1" height="1" fill="#F0913C"/><rect x="16" y="15" width="1" height="1" fill="#C96A22"/>
+      <rect x="13" y="16" width="1" height="1" fill="#F5EFE4"/><rect x="13" y="17" width="1" height="1" fill="#F5EFE4"/><rect x="12" y="17" width="1" height="1" fill="#5A4A3F"/>
+    </g>
+    <g id="carrotSeg2">
+      <rect x="14" y="16" width="1" height="1" fill="#C96A22"/><rect x="15" y="16" width="1" height="1" fill="#F0913C"/><rect x="16" y="16" width="1" height="1" fill="#C96A22"/>
+    </g>
+    <g id="carrotSeg1">
+      <rect x="15" y="17" width="1" height="1" fill="#F0913C"/><rect x="16" y="17" width="1" height="1" fill="#C96A22"/>
+      <rect x="15" y="18" width="1" height="1" fill="#C96A22"/>
+    </g>
+  </g>
+
+  <!-- 打字拟声词 -->
+  <g id="sounds">
+    <text class="snd"></text><text class="snd"></text><text class="snd"></text>
+    <text class="snd"></text><text class="snd"></text><text class="snd"></text>
+  </g>
+</svg>
+
+<script>
+  /* ─── 像素图谱：与 rabbit-idle.svg.html 完全一致（角色一致性）。28×28。 */
+  const SPRITE = [
+    "............................",
+    "........OWWWO..OWWWO........",
+    "........OWPWO..OWPWO........",
+    "........OWPWO..OWPWO........",
+    "........OWPWO..OWPWO........",
+    "........OWPWO..OWPWO........",
+    "........OWWWO..OWWWO........",
+    "........OWWWO..OWWWO........",
+    "......OOWWWWWWWWWWWWOO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWPPWWWWWWO......",
+    "......OWPWWWWWWWWWWPWO......",
+    "......OOWWWWWWWWWWWWOO......",
+    "......OOWWWWWWWWWWWWOO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWBBBBBBBBWWWO......",
+    "......OWWWBBBBBBBBWWWO......",
+    "......OWWWBBBBBBBBWWWO......",
+    "......OWWWWBBBBBBWWWWO......",
+    "......OOWWWWWWWWWWWWOO......",
+    "........OWWWO..OWWWO........",
+    "........OWWWO..OWWWO........",
+    "........OOOOO..OOOOO........",
+    "............................"
+  ];
+  const PALETTE = { O:"#5A4A3F", W:"#F5EFE4", B:"#FFFBF4", P:"#F4A7B6" };
+
+  const SVGNS = "http://www.w3.org/2000/svg";
+  const earsG = document.getElementById("ears");
+  const bodyG = document.getElementById("body");
+
+  SPRITE.forEach((row, y) => {
+    for (let x = 0; x < row.length; x++) {
+      const c = row[x];
+      if (c === "." || !PALETTE[c]) continue;
+      const r = document.createElementNS(SVGNS, "rect");
+      r.setAttribute("x", x); r.setAttribute("y", y);
+      r.setAttribute("width", 1); r.setAttribute("height", 1);
+      r.setAttribute("fill", PALETTE[c]);
+      (y < 8 ? earsG : bodyG).appendChild(r);
+    }
+  });
+
+  const root = getComputedStyle(document.documentElement);
+  const num = k => parseInt(root.getPropertyValue(k));
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  // ── 眨眼 ──
+  const eyesOpen = document.getElementById("eyesOpen");
+  const eyesClosed = document.getElementById("eyesClosed");
+  function blink() {
+    eyesOpen.style.display = "none"; eyesClosed.style.display = "";
+    setTimeout(() => { eyesClosed.style.display = "none"; eyesOpen.style.display = ""; }, num("--blink-frame"));
+  }
+  (function scheduleBlink() {
+    const gap = num("--blink-min-gap") + Math.random() * (num("--blink-max-gap") - num("--blink-min-gap"));
+    setTimeout(() => { blink(); scheduleBlink(); }, gap);
+  })();
+
+  // ── 耳朵慵懒一抖 ──
+  function earFlick(ms) {
+    earsG.style.transform = "translateY(1px)";
+    setTimeout(() => { earsG.style.transform = ""; }, ms);
+  }
+  (function scheduleEar() {
+    setTimeout(() => { earFlick(160); scheduleEar(); }, 4000 + Math.random() * 4000);
+  })();
+
+  // ── 吃胡萝卜彩蛋：从桌上拿起 → 咬两口 → 放回（B 类，手只在此时出现）──
+  const carrotDesk = document.getElementById("carrotDesk");
+  const carrotEat  = document.getElementById("carrotEat");
+  const seg1 = document.getElementById("carrotSeg1");
+  const seg2 = document.getElementById("carrotSeg2");
+  let eating = false;
+
+  async function eatCarrot() {
+    if (eating) return; eating = true;
+    seg1.style.display = ""; seg2.style.display = "";
+    carrotDesk.style.display = "none";
+    carrotEat.style.display = "";
+
+    // 从桌上把萝卜拿起来、移到嘴边
+    carrotEat.style.transform = "translate(9px,5px)"; await sleep(120);  // 抓住
+    carrotEat.style.transform = "translate(5px,3px)"; await sleep(110);  // 提起
+    carrotEat.style.transform = "translate(0,0)";     await sleep(220);  // 到嘴边
+
+    // 咬第一口（尖端）
+    carrotEat.style.transform = "translate(0,1px)";   await sleep(90);
+    seg1.style.display = "none";
+    carrotEat.style.transform = "translate(0,0)";     await sleep(320);
+    // 咬第二口
+    carrotEat.style.transform = "translate(0,1px)";   await sleep(90);
+    seg2.style.display = "none";
+    carrotEat.style.transform = "translate(0,0)";     await sleep(320);
+    await sleep(160);
+
+    // 放回桌上（恢复整根）
+    seg1.style.display = ""; seg2.style.display = "";
+    carrotEat.style.transform = "translate(5px,3px)"; await sleep(110);
+    carrotEat.style.transform = "translate(9px,5px)"; await sleep(120);
+    carrotEat.style.display = "none"; carrotEat.style.transform = "";
+    carrotDesk.style.display = "";
+    eating = false;
+  }
+  (function scheduleCarrot() {
+    const gap = num("--carrot-min-gap") + Math.random() * (num("--carrot-max-gap") - num("--carrot-min-gap"));
+    setTimeout(async () => { await eatCarrot(); scheduleCarrot(); }, gap);
+  })();
+
+  // ── 打字拟声词 "da" 像烟一样慢慢上飘（吃东西时停手不打字）──
+  const snds = [...document.querySelectorAll(".snd")];
+  let si = 0;
+  function emitSound() {
+    if (eating) return;
+    const t = snds[si % snds.length]; si++;
+    const leftSide = Math.random() < 0.5;
+    t.setAttribute("x", leftSide ? (4 + Math.floor(Math.random() * 4))     // 左侧 4-7
+                                 : (17 + Math.floor(Math.random() * 5)));   // 右侧 17-21
+    t.setAttribute("y", 18);
+    t.textContent = "da";
+    t.classList.remove("riseL", "riseR");
+    void t.getBBox();
+    t.classList.add(leftSide ? "riseL" : "riseR");   // 左侧往左飘，右侧往右飘
+  }
+  (function scheduleSound() {
+    setTimeout(() => { emitSound(); scheduleSound(); }, 600 + Math.random() * 400);
+  })();
+</script>
+
+</body>
+</html>

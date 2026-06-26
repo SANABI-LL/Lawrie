@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:,">
+<title>my-pet · 柴犬 · idle</title>
+<style>
+  /*
+    柴犬桌宠 · idle 状态（A 类：循环，首=尾）
+    ───────────────────────────────────────────
+    自包含 .svg.html，零依赖，双击即跑。
+    角色造型在 <g id="pet">；改节奏/配色改下面 :root。
+    typing.svg.html 复用同一套造型，只换动画层。
+  */
+
+  :root {
+    /* —— 节奏档位（apple-precise：克制、缓、圆润）—— */
+    --breath-period: 4.8s;
+    --breath-min: 0.985;
+    --breath-max: 1.02;
+    --float-amp: 3px;
+
+    --blink-min-gap: 3000;
+    --blink-max-gap: 7000;
+    --blink-duration: 150;
+
+    /* —— 柴犬配色（改这些适配你的审美）—— */
+    --coat: #E8A864;        /* 柴犬红/茶色被毛 */
+    --coat-line: #C9853F;   /* 主描边 */
+    --cream: #FBF1E4;       /* urajiro 奶白（吻部/胸口/爪） */
+    --ear-inner: #F2C8A0;   /* 内耳 */
+    --ink: #3A2A1E;         /* 眼/鼻 深可可，不用纯黑 */
+    --blush: #F2938C;       /* 腮红 */
+    --shadow: rgba(120, 84, 60, 0.16);
+    --bg: #FBF7F2;
+  }
+
+  html, body { margin: 0; min-height: 100vh; background: var(--bg); }
+  body { display: grid; min-height: 100vh; place-items: center;
+         font-family: -apple-system, system-ui, sans-serif; }
+
+  #stage { width: min(340px, 88vmin); aspect-ratio: 1; display: block; }
+
+  /* 呼吸：整体缩放 + 轻微上下浮动。pivot 锚身体中心。 */
+  #pet {
+    transform-box: view-box;
+    transform-origin: 100px 130px;
+    animation: breathe var(--breath-period) ease-in-out infinite;
+  }
+  @keyframes breathe {
+    0%, 100% { transform: translateY(var(--float-amp)) scale(var(--breath-min)); }
+    50%      { transform: translateY(calc(var(--float-amp) * -1)) scale(var(--breath-max)); }
+  }
+
+  /* 尾巴：缓慢小幅摆动 */
+  #tail {
+    transform-box: view-box;
+    transform-origin: 128px 142px;
+    animation: tailWag 3.2s ease-in-out infinite;
+  }
+  @keyframes tailWag {
+    0%, 100% { transform: rotate(-3deg); }
+    50%      { transform: rotate(3deg); }
+  }
+
+  /* 地面阴影：与呼吸反向脉动 */
+  #shadow {
+    transform-origin: 100px 184px;
+    animation: shadowPulse var(--breath-period) ease-in-out infinite;
+  }
+  @keyframes shadowPulse {
+    0%, 100% { opacity: 0.72; transform: scaleX(0.94); }
+    50%      { opacity: 0.5;  transform: scaleX(1.06); }
+  }
+
+  /* 眨眼：scaleY 压扁，pivot 锚眼睛中心 */
+  .eye { transform-box: fill-box; transform-origin: center; transition: transform 0.075s ease-out; }
+  .eye.blink { transform: scaleY(0.1); }
+
+  #hint { position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+          font-size: 12px; color: #B9A89A; letter-spacing: 0.5px; }
+</style>
+</head>
+<body>
+
+<div id="hint">my-pet · 柴犬 · idle</div>
+
+<svg id="stage" viewBox="0 0 200 200" role="img" aria-label="一只会呼吸眨眼的柴犬桌宠" xmlns="http://www.w3.org/2000/svg">
+  <ellipse id="shadow" cx="100" cy="184" rx="48" ry="8" fill="var(--shadow)"/>
+
+  <!-- ┌─────────────────────────────────────────────┐
+       │  柴犬造型（idle / typing 共用，勿单独改散）   │
+       └─────────────────────────────────────────────┘ -->
+  <g id="pet">
+    <!-- 卷尾（在身体后面） -->
+    <path id="tail" d="M130 150 C168 152 172 102 142 96 C162 106 158 134 126 140 Z"
+          fill="var(--coat)" stroke="var(--coat-line)" stroke-width="2.5" stroke-linejoin="round"/>
+
+    <!-- 身体 -->
+    <ellipse cx="100" cy="140" rx="40" ry="34" fill="var(--coat)" stroke="var(--coat-line)" stroke-width="2.5"/>
+    <!-- 胸口奶白 -->
+    <path d="M100 112 Q120 122 120 148 Q120 170 100 172 Q80 170 80 148 Q80 122 100 112 Z" fill="var(--cream)"/>
+
+    <!-- 前爪（typing 时这两只会敲键盘） -->
+    <ellipse id="paw-l" class="paw" cx="84"  cy="168" rx="13" ry="9" fill="var(--cream)" stroke="var(--coat-line)" stroke-width="2"/>
+    <ellipse id="paw-r" class="paw" cx="116" cy="168" rx="13" ry="9" fill="var(--cream)" stroke="var(--coat-line)" stroke-width="2"/>
+
+    <!-- 头部 -->
+    <g id="head">
+      <!-- 耳朵（先画，被头压住底部） -->
+      <path d="M70 56 L60 18 L96 48 Z"  fill="var(--coat)" stroke="var(--coat-line)" stroke-width="2.5" stroke-linejoin="round"/>
+      <path d="M130 56 L140 18 L104 48 Z" fill="var(--coat)" stroke="var(--coat-line)" stroke-width="2.5" stroke-linejoin="round"/>
+      <path d="M73 50 L67 27 L90 47 Z"  fill="var(--ear-inner)"/>
+      <path d="M127 50 L133 27 L110 47 Z" fill="var(--ear-inner)"/>
+
+      <!-- 头 -->
+      <circle cx="100" cy="84" r="40" fill="var(--coat)" stroke="var(--coat-line)" stroke-width="2.5"/>
+      <!-- 顶部高光弧 -->
+      <path d="M72 64 Q100 50 128 64" fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.5" stroke-linecap="round"/>
+
+      <!-- 下半脸奶白（吻部 + 脸颊绒毛） -->
+      <ellipse cx="100" cy="100" rx="30" ry="21" fill="var(--cream)"/>
+      <ellipse cx="64"  cy="92"  rx="9"  ry="11" fill="var(--cream)"/>
+      <ellipse cx="136" cy="92"  rx="9"  ry="11" fill="var(--cream)"/>
+
+      <!-- 眉点（柴犬经典 urajiro 斑） -->
+      <ellipse cx="80"  cy="68" rx="4" ry="3" fill="var(--cream)"/>
+      <ellipse cx="120" cy="68" rx="4" ry="3" fill="var(--cream)"/>
+
+      <!-- 眼睛 -->
+      <ellipse class="eye" cx="80"  cy="82" rx="5.5" ry="7" fill="var(--ink)"/>
+      <ellipse class="eye" cx="120" cy="82" rx="5.5" ry="7" fill="var(--ink)"/>
+      <circle  class="eye" cx="82"  cy="79" r="1.8" fill="#FFFFFF"/>
+      <circle  class="eye" cx="122" cy="79" r="1.8" fill="#FFFFFF"/>
+
+      <!-- 鼻子 -->
+      <ellipse cx="100" cy="93" rx="5" ry="4" fill="var(--ink)"/>
+      <!-- 嘴（柴犬微笑） -->
+      <path d="M100 97 L100 102 M100 102 Q92 109 84 103 M100 102 Q108 109 116 103"
+            fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+      <!-- 腮红 -->
+      <ellipse cx="68"  cy="101" rx="7" ry="4.5" fill="var(--blush)" opacity="0.5"/>
+      <ellipse cx="132" cy="101" rx="7" ry="4.5" fill="var(--blush)" opacity="0.5"/>
+    </g>
+  </g>
+</svg>
+
+<script>
+  /* 眨眼调度：随机间隔 3–7s + 10% 双连眨 */
+  const eyes = document.querySelectorAll('.eye');
+  const root = getComputedStyle(document.documentElement);
+  const minGap = parseInt(root.getPropertyValue('--blink-min-gap'));
+  const maxGap = parseInt(root.getPropertyValue('--blink-max-gap'));
+  const blinkMs = parseInt(root.getPropertyValue('--blink-duration'));
+
+  function blinkOnce() {
+    eyes.forEach(e => e.classList.add('blink'));
+    setTimeout(() => eyes.forEach(e => e.classList.remove('blink')), blinkMs);
+  }
+  function scheduleNext() {
+    const gap = minGap + Math.random() * (maxGap - minGap);
+    setTimeout(() => {
+      blinkOnce();
+      if (Math.random() < 0.1) setTimeout(blinkOnce, blinkMs + 120);
+      scheduleNext();
+    }, gap);
+  }
+  scheduleNext();
+</script>
+
+</body>
+</html>

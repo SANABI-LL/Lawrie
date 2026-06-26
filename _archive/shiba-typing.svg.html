@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:,">
+<title>my-pet · 柴犬 · typing</title>
+<style>
+  /*
+    柴犬桌宠 · typing 状态（A 类：循环，首=尾）
+    ───────────────────────────────────────────
+    复用 idle 的柴犬造型，只换动画层：
+      · 身体小幅律动（bob）
+      · 两前爪交替敲键（错相半拍）
+      · 尾巴兴奋快摆、头微低
+    键盘是静态桌面元素，不跟狗一起跳。
+  */
+
+  :root {
+    --tap-period: 0.34s;     /* 敲键节奏，越小打字越急 */
+    --bob-period: 0.56s;     /* 身体律动 */
+    --tap-depth: 5px;        /* 爪子下压深度 */
+
+    --blink-min-gap: 3000;
+    --blink-max-gap: 7000;
+    --blink-duration: 150;
+
+    --coat: #E8A864;
+    --coat-line: #C9853F;
+    --cream: #FBF1E4;
+    --ear-inner: #F2C8A0;
+    --ink: #3A2A1E;
+    --blush: #F2938C;
+    --shadow: rgba(120, 84, 60, 0.16);
+    --key: #CBD4E0;
+    --key-line: #AEB9C8;
+    --key-top: #E0E6EE;
+    --bg: #FBF7F2;
+  }
+
+  html, body { margin: 0; min-height: 100vh; background: var(--bg); }
+  body { display: grid; min-height: 100vh; place-items: center;
+         font-family: -apple-system, system-ui, sans-serif; }
+
+  #stage { width: min(340px, 88vmin); aspect-ratio: 1; display: block; }
+
+  /* 身体律动：快而小的上下 bob */
+  #pet {
+    transform-box: view-box;
+    transform-origin: 100px 140px;
+    animation: bob var(--bob-period) ease-in-out infinite;
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-2.5px); }
+  }
+
+  /* 头微低（看键盘），并随律动轻点头 */
+  #head {
+    transform-box: view-box;
+    transform-origin: 100px 84px;
+    animation: nod var(--bob-period) ease-in-out infinite;
+  }
+  @keyframes nod {
+    0%, 100% { transform: translateY(2px) rotate(-0.5deg); }
+    50%      { transform: translateY(3.5px) rotate(0.5deg); }
+  }
+
+  /* 前爪交替敲键：错相半拍 */
+  .paw { transform-box: fill-box; transform-origin: center; }
+  #paw-l { animation: tap var(--tap-period) ease-in-out infinite; }
+  #paw-r { animation: tap var(--tap-period) ease-in-out infinite; animation-delay: calc(var(--tap-period) / -2); }
+  @keyframes tap {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(var(--tap-depth)); }
+  }
+
+  /* 尾巴：兴奋快摆 */
+  #tail {
+    transform-box: view-box;
+    transform-origin: 128px 142px;
+    animation: wag 0.9s ease-in-out infinite;
+  }
+  @keyframes wag {
+    0%, 100% { transform: rotate(-6deg); }
+    50%      { transform: rotate(7deg); }
+  }
+
+  /* 眨眼 */
+  .eye { transform-box: fill-box; transform-origin: center; transition: transform 0.075s ease-out; }
+  .eye.blink { transform: scaleY(0.1); }
+
+  #hint { position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+          font-size: 12px; color: #B9A89A; letter-spacing: 0.5px; }
+</style>
+</head>
+<body>
+
+<div id="hint">my-pet · 柴犬 · typing</div>
+
+<svg id="stage" viewBox="0 0 200 200" role="img" aria-label="一只在敲键盘打字的柴犬桌宠" xmlns="http://www.w3.org/2000/svg">
+  <ellipse id="shadow" cx="100" cy="192" rx="54" ry="7" fill="var(--shadow)"/>
+
+  <!-- 键盘：静态桌面元素，不随狗律动 -->
+  <g id="keyboard">
+    <rect x="54" y="176" width="92" height="15" rx="5" fill="var(--key)" stroke="var(--key-line)" stroke-width="2"/>
+    <rect x="56" y="177" width="88" height="5"  rx="4" fill="var(--key-top)"/>
+    <g stroke="var(--key-line)" stroke-width="1.5" stroke-linecap="round">
+      <line x1="68"  y1="185" x2="68"  y2="188"/>
+      <line x1="82"  y1="185" x2="82"  y2="188"/>
+      <line x1="96"  y1="185" x2="96"  y2="188"/>
+      <line x1="110" y1="185" x2="110" y2="188"/>
+      <line x1="124" y1="185" x2="124" y2="188"/>
+    </g>
+  </g>
+
+  <!-- ┌─────────────────────────────────────────────┐
+       │  柴犬造型（与 idle.svg.html 完全一致）        │
+       └─────────────────────────────────────────────┘ -->
+  <g id="pet">
+    <path id="tail" d="M130 150 C168 152 172 102 142 96 C162 106 158 134 126 140 Z"
+          fill="var(--coat)" stroke="var(--coat-line)" stroke-width="2.5" stroke-linejoin="round"/>
+
+    <ellipse cx="100" cy="140" rx="40" ry="34" fill="var(--coat)" stroke="var(--coat-line)" stroke-width="2.5"/>
+    <path d="M100 112 Q120 122 120 148 Q120 170 100 172 Q80 170 80 148 Q80 122 100 112 Z" fill="var(--cream)"/>
+
+    <ellipse id="paw-l" class="paw" cx="84"  cy="168" rx="13" ry="9" fill="var(--cream)" stroke="var(--coat-line)" stroke-width="2"/>
+    <ellipse id="paw-r" class="paw" cx="116" cy="168" rx="13" ry="9" fill="var(--cream)" stroke="var(--coat-line)" stroke-width="2"/>
+
+    <g id="head">
+      <path d="M70 56 L60 18 L96 48 Z"  fill="var(--coat)" stroke="var(--coat-line)" stroke-width="2.5" stroke-linejoin="round"/>
+      <path d="M130 56 L140 18 L104 48 Z" fill="var(--coat)" stroke="var(--coat-line)" stroke-width="2.5" stroke-linejoin="round"/>
+      <path d="M73 50 L67 27 L90 47 Z"  fill="var(--ear-inner)"/>
+      <path d="M127 50 L133 27 L110 47 Z" fill="var(--ear-inner)"/>
+
+      <circle cx="100" cy="84" r="40" fill="var(--coat)" stroke="var(--coat-line)" stroke-width="2.5"/>
+      <path d="M72 64 Q100 50 128 64" fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.5" stroke-linecap="round"/>
+
+      <ellipse cx="100" cy="100" rx="30" ry="21" fill="var(--cream)"/>
+      <ellipse cx="64"  cy="92"  rx="9"  ry="11" fill="var(--cream)"/>
+      <ellipse cx="136" cy="92"  rx="9"  ry="11" fill="var(--cream)"/>
+
+      <ellipse cx="80"  cy="68" rx="4" ry="3" fill="var(--cream)"/>
+      <ellipse cx="120" cy="68" rx="4" ry="3" fill="var(--cream)"/>
+
+      <ellipse class="eye" cx="80"  cy="82" rx="5.5" ry="7" fill="var(--ink)"/>
+      <ellipse class="eye" cx="120" cy="82" rx="5.5" ry="7" fill="var(--ink)"/>
+      <circle  class="eye" cx="82"  cy="79" r="1.8" fill="#FFFFFF"/>
+      <circle  class="eye" cx="122" cy="79" r="1.8" fill="#FFFFFF"/>
+
+      <ellipse cx="100" cy="93" rx="5" ry="4" fill="var(--ink)"/>
+      <path d="M100 97 L100 102 M100 102 Q92 109 84 103 M100 102 Q108 109 116 103"
+            fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+      <ellipse cx="68"  cy="101" rx="7" ry="4.5" fill="var(--blush)" opacity="0.5"/>
+      <ellipse cx="132" cy="101" rx="7" ry="4.5" fill="var(--blush)" opacity="0.5"/>
+    </g>
+  </g>
+</svg>
+
+<script>
+  /* 眨眼调度：随机间隔 + 10% 双连眨（与 idle 一致，保证活物感连续） */
+  const eyes = document.querySelectorAll('.eye');
+  const root = getComputedStyle(document.documentElement);
+  const minGap = parseInt(root.getPropertyValue('--blink-min-gap'));
+  const maxGap = parseInt(root.getPropertyValue('--blink-max-gap'));
+  const blinkMs = parseInt(root.getPropertyValue('--blink-duration'));
+
+  function blinkOnce() {
+    eyes.forEach(e => e.classList.add('blink'));
+    setTimeout(() => eyes.forEach(e => e.classList.remove('blink')), blinkMs);
+  }
+  function scheduleNext() {
+    const gap = minGap + Math.random() * (maxGap - minGap);
+    setTimeout(() => {
+      blinkOnce();
+      if (Math.random() < 0.1) setTimeout(blinkOnce, blinkMs + 120);
+      scheduleNext();
+    }, gap);
+  }
+  scheduleNext();
+</script>
+
+</body>
+</html>
