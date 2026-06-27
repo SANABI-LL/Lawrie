@@ -28,15 +28,17 @@
 | sleeping | `rabbit-sleeping.svg.html` | 趴睡 + 舔嘴 + 萝卜梦境泡泡 | ✅ |
 | happy | `rabbit-happy.svg.html` | 蹦跳欢呼 + 举手 + 星星 | ✅ |
 | error | `rabbit-error-v2.svg.html` | XX 晕眼 + 金星绕头 + glitch 错位 | ✅ |
-| notification | — | 通知警觉（耳朵竖 + ！） | ⬜ |
-| carrying | — | 搬运（抱大萝卜） | ⬜ |
+| notification | `rabbit-notification.svg.html` | 盯人 + 两侧 ping 声波 + 闪烁大"!" + 兜里露橙头 | ✅ |
+| carrying | `rabbit-carrying.svg.html` | 团队大哥：戴墨镜 + 左拳冲天 + 右举长萝卜剑 + 嘚瑟晃动 + 墨镜扫光 | ✅ |
 
-**已完成 6 个状态**：覆盖了「最小可上线集」(idle/typing/thinking/sleeping/happy) + error。
+**8 件套全部完成** 🎉：最小可上线集 (idle/typing/thinking/sleeping/happy) + error + notification + carrying。
+
+> carrying 的语义最后定为「扛起重任的团队大哥」——胡萝卜是它披荆斩棘的武器，戴着墨镜嘚瑟亮相。
 
 ## 项目阶段
 
 - [x] ①角色设计（拓扑 + 像素风格 + 萝卜 motif）
-- [x] ②做状态动画（6/8 建议状态）
+- [x] ②做状态动画（8/8 建议状态全部完成）
 - [ ] ③接桌宠运行时（theme.json 映射 agent 事件 → 状态切换）
 - [ ] ④部署成真正会动的桌面挂件
 

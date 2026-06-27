@@ -1,2 +1,8 @@
-﻿Thumbs.db
+Thumbs.db
 .DS_Store
+
+# 运行时挂件的依赖与构建产物（不入库）
+runtime/widget/node_modules/
+runtime/widget/dist/
+runtime/widget/assets/
+runtime/widget/config.json

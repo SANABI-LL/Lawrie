@@ -1,0 +1,23 @@
+{
+  "name": "lawrie-widget",
+  "version": "1.0.0",
+  "description": "Lawrie 像素萝卜兔桌宠 · 桌面挂件",
+  "author": "SANABI-LL",
+  "main": "main.js",
+  "scripts": {
+    "sync": "node sync-assets.js",
+    "start": "node sync-assets.js && electron .",
+    "dist": "node sync-assets.js && electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.sanabi.lawrie",
+    "productName": "Lawrie",
+    "directories": { "output": "dist" },
+    "files": ["main.js", "pet.html", "theme.json", "assets/**/*"],
+    "win": { "target": "portable" }
+  }
+}

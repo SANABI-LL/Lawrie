@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  /* 整窗透明；移动用系统原生拖动（-webkit-app-region: drag）—— 不卡、零偏移 */
+  html, body {
+    margin: 0; width: 100%; height: 100%; overflow: hidden;
+    background: transparent; -webkit-user-select: none;
+    -webkit-app-region: drag; cursor: grab;
+  }
+  #pet {
+    position: fixed; inset: 0; width: 100%; height: 100%;
+    border: 0; background: transparent; pointer-events: none;
+  }
+  /* 两个缩放手柄：左上角 + 右下角（始终淡淡可见，悬停更亮） */
+  .grip {
+    position: fixed; width: 36px; height: 36px;
+    -webkit-app-region: no-drag; pointer-events: auto;
+    opacity: .32; transition: opacity .15s; cursor: nwse-resize;
+  }
+  body:hover .grip { opacity: .9; }
+  .grip::after {
+    content: ""; position: absolute; width: 18px; height: 18px;
+    background: repeating-linear-gradient(135deg, #FFC078 0 2px, transparent 2px 4px);
+  }
+  .grip.se { right: 0; bottom: 0; }
+  .grip.se::after { right: 5px; bottom: 5px;
+    -webkit-clip-path: polygon(100% 0, 100% 100%, 0 100%); clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+  .grip.nw { left: 0; top: 0; }
+  .grip.nw::after { left: 5px; top: 5px;
+    -webkit-clip-path: polygon(0 0, 100% 0, 0 100%); clip-path: polygon(0 0, 100% 0, 0 100%); }
+</style>
+</head>
+<body>
+  <iframe id="pet" scrolling="no"></iframe>
+  <div class="grip nw" data-c="nw"></div>
+  <div class="grip se" data-c="se"></div>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+    const fs    = require('fs');
+    const path  = require('path');
+    const theme = require('./theme.json');
+    const keys  = Object.keys(theme.states);
+    const frame = document.getElementById('pet');
+    const STEP = 24;
+
+    // 初始尺寸（取值加保险，拿不到就用 220，绝不为 undefined）
+    let size = 220;
+    try { const s = ipcRenderer.sendSync('get-size'); if (typeof s === 'number' && s >= 100) size = s; } catch (e) {}
+    let current = theme.default || keys[0];
+
+    function setState(name) {
+      if (!theme.states[name]) return;
+      current = name;
+      let html = fs.readFileSync(path.join(__dirname, theme.assetsDir, theme.states[name]), 'utf-8');
+      html = html.replace('</head>',
+        '<style>html,body{background:transparent !important;}' +
+        ':root{--pixel-size:' + size + 'px !important;}</style></head>');
+      frame.srcdoc = html;
+    }
+    setState(current);
+
+    // 实时改兔子尺寸（快路径）
+    function liveSize() {
+      try { frame.contentDocument.documentElement.style.setProperty('--pixel-size', size + 'px', 'important'); } catch (e) {}
+    }
+    // 收到窗口尺寸变化：先快改，再兜底重渲染（保证打包后也一定生效、不被裁）
+    let reRender = null;
+    ipcRenderer.on('size-changed', (e, s) => {
+      size = s;
+      liveSize();
+      clearTimeout(reRender);
+      reRender = setTimeout(() => setState(current), 140);
+    });
+
+    // ── Claude hook 驱动：切状态；happy/error/notification 闪几秒自动回 idle ──
+    const MOMENTARY = { happy: 3500, error: 3000, notification: 3000 };
+    let revertTimer = null;
+    function applyState(name) {
+      if (!theme.states[name]) return;
+      setState(name);
+      clearTimeout(revertTimer);
+      if (MOMENTARY[name]) revertTimer = setTimeout(() => setState(theme.default || keys[0]), MOMENTARY[name]);
+    }
+    ipcRenderer.on('pet-state', (e, name) => applyState(name));
+
+    // 拖角缩放：指针捕获保证 move/up 一定收到（不会卡）
+    document.querySelectorAll('.grip').forEach((g) => {
+      g.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        try { g.setPointerCapture(e.pointerId); } catch (_) {}
+        ipcRenderer.send('resize-start', g.dataset.c);
+        const mv = (ev) => ipcRenderer.send('resize-move', { x: ev.screenX, y: ev.screenY });
+        const up = () => {
+          ipcRenderer.send('resize-end');
+          g.removeEventListener('pointermove', mv);
+          g.removeEventListener('pointerup', up);
+          g.removeEventListener('pointercancel', up);
+        };
+        g.addEventListener('pointermove', mv);
+        g.addEventListener('pointerup', up);
+        g.addEventListener('pointercancel', up);
+      });
+    });
+
+    // 键盘：1–8 切状态；+ / - 微调缩放；Ctrl+Q 退出
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'q' || e.key === 'Q')) { window.close(); return; }
+      if (e.key === '+' || e.key === '=') { ipcRenderer.send('set-size', size + STEP); return; }
+      if (e.key === '-' || e.key === '_') { ipcRenderer.send('set-size', size - STEP); return; }
+      const n = parseInt(e.key, 10);
+      if (n >= 1 && n <= keys.length) setState(keys[n - 1]);
+    });
+  </script>
+</body>
+</html>

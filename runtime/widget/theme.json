@@ -1,0 +1,19 @@
+{
+  "name": "Lawrie",
+  "author": "SANABI-LL",
+  "version": "1.0.0",
+  "viewBox": 28,
+  "_comment": "状态清单：state 名 -> 兔子动画文件。assetsDir 指向本地 assets/（自包含、可打包）。改了状态文件后跑 node sync-assets.js 同步。",
+  "assetsDir": "assets/",
+  "default": "idle",
+  "states": {
+    "idle":         "rabbit-idle.svg.html",
+    "thinking":     "rabbit-thinking-v2.svg.html",
+    "typing":       "rabbit-typing.svg.html",
+    "happy":        "rabbit-happy.svg.html",
+    "error":        "rabbit-error-v2.svg.html",
+    "notification": "rabbit-notification.svg.html",
+    "carrying":     "rabbit-carrying.svg.html",
+    "sleeping":     "rabbit-sleeping.svg.html"
+  }
+}
