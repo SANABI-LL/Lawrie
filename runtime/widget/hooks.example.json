@@ -1,0 +1,14 @@
+{
+  "_README": "把这段 hooks 合并进你的 Claude Code 配置（用户级 ~/.claude/settings.json 或项目级 .claude/settings.json）。它让 Claude Code 的生命周期事件通过本地 HTTP(127.0.0.1:4747) 驱动挂件切状态。挂件先启动（npm start，或打包后的 Lawrie 可执行文件）后这些 hook 才有接收端；挂件没开时 `|| exit 0` 保证 hook 不报错。把 SessionStart 里的 PATH_TO 换成你本机挂件可执行文件的实际路径。",
+  "hooks": {
+    "SessionStart":       [{ "matcher": "", "hooks": [{ "type": "command", "command": "curl -s -m 1 http://127.0.0.1:4747/idle || explorer.exe \"PATH_TO\\Lawrie.exe\" || exit 0" }] }],
+    "UserPromptSubmit":   [{ "matcher": "", "hooks": [{ "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/thinking || exit 0" }] }],
+    "PreToolUse":         [{ "matcher": "", "hooks": [{ "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/typing || exit 0" }] }],
+    "PostToolUse":        [{ "matcher": "", "hooks": [{ "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/typing || exit 0" }] }],
+    "PostToolUseFailure": [{ "matcher": "", "hooks": [{ "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/error || exit 0" }] }],
+    "Notification":       [{ "matcher": "", "hooks": [{ "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/notification || exit 0" }] }],
+    "SubagentStart":      [{ "matcher": "", "hooks": [{ "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/carrying || exit 0" }] }],
+    "SubagentStop":       [{ "matcher": "", "hooks": [{ "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/typing || exit 0" }] }],
+    "Stop":               [{ "matcher": "", "hooks": [{ "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/notification || exit 0" }] }]
+  }
+}

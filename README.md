@@ -39,8 +39,36 @@
 
 - [x] ①角色设计（拓扑 + 像素风格 + 萝卜 motif）
 - [x] ②做状态动画（8/8 建议状态全部完成）
-- [ ] ③接桌宠运行时（theme.json 映射 agent 事件 → 状态切换）
-- [ ] ④部署成真正会动的桌面挂件
+- [x] ③接桌宠运行时（`runtime/widget/` 自做 Electron 挂件 + `theme.json` 状态清单 + 本地 4747 接 Claude 事件）
+- [x] ④部署成真正会动的桌面挂件（打包成可执行文件、随 Claude Code 会话自启、对真实工具事件实时换状态）
+
+## 运行时 / 桌面挂件
+
+`runtime/widget/` 是一个自做的极简 Electron 挂件（透明置顶、原生拖动、拖角缩放、大小记忆），把上面 8 个 `.svg.html` 状态接成一只**会跟着 Claude Code 实时变状态**的桌宠。
+
+**怎么跑**：
+
+```bash
+cd runtime/widget
+npm install
+npm start          # 同步状态资源并启动挂件（开发用）
+# 或 npm run dist   # 打包成桌面可执行文件
+```
+
+**实时联动原理**：挂件在 `127.0.0.1:4747` 起一个本地 HTTP 服务，`GET /<状态名>` 就把兔子切到对应状态。再通过 Claude Code 的 [hooks](https://docs.claude.com/en/docs/claude-code/hooks) 把生命周期事件映射成对这个端口的请求，于是 Claude 一边干活，兔子一边自己换表情：
+
+| Claude Code 事件 | 兔子状态 |
+|---|---|
+| SessionStart | idle（顺带没开就拉起挂件） |
+| UserPromptSubmit | thinking |
+| Pre/PostToolUse | typing |
+| PostToolUseFailure | error |
+| SubagentStart / Stop | carrying / typing |
+| Notification、Stop（答完） | notification |
+
+可直接复用的 hook 配置见 [`runtime/widget/hooks.example.json`](runtime/widget/hooks.example.json)——合并进你的 `~/.claude/settings.json`（或项目级 `.claude/settings.json`）即可。
+
+> 注：真正生效的 hook 住在使用者本机的 `~/.claude/settings.json`（个人全局配置，不入公共仓库），所以**光看这个仓库是看不到接线的**——它就在 `hooks.example.json` 里，照抄进自己的 settings 就接通了。`idle` 还支持眼球跟随鼠标（±1px 像素一瞥）。
 
 ## 制作说明
 
