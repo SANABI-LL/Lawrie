@@ -46,6 +46,10 @@
   /* 彩蛋里胡萝卜的"举起/放回"用整像素位移，瞬切不缓动 */
   #carrotEat { transition: none; }
 
+  /* 眼球跟随：整只眼朝光标方向挪 ±1 像素。挂件经 --aim-x/--aim-y 驱动；
+     没驱动时（网页预览/独立打开）默认 0 = 居中，优雅退化为不跟随。瞬切不缓动。 */
+  #eyes { transform: translate(var(--aim-x, 0px), var(--aim-y, 0px)); }
+
 </style>
 </head>
 <body>
@@ -107,20 +111,22 @@
       </g>
     </g>
 
-    <!-- 眼睛：单独画，眨眼整帧替换 -->
-    <g id="eyesOpen">
-      <rect x="10" y="12" width="1" height="1" fill="#FFFFFF"/>
-      <rect x="11" y="12" width="1" height="1" fill="#37291F"/>
-      <rect x="10" y="13" width="1" height="1" fill="#37291F"/>
-      <rect x="11" y="13" width="1" height="1" fill="#37291F"/>
-      <rect x="16" y="12" width="1" height="1" fill="#FFFFFF"/>
-      <rect x="17" y="12" width="1" height="1" fill="#37291F"/>
-      <rect x="16" y="13" width="1" height="1" fill="#37291F"/>
-      <rect x="17" y="13" width="1" height="1" fill="#37291F"/>
-    </g>
-    <g id="eyesClosed" style="display:none">
-      <rect x="10" y="13" width="2" height="1" fill="#37291F"/>
-      <rect x="16" y="13" width="2" height="1" fill="#37291F"/>
+    <!-- 眼睛：单独画，眨眼整帧替换。外层 #eyes 受 --aim-x/y 平移做眼球跟随 -->
+    <g id="eyes">
+      <g id="eyesOpen">
+        <rect x="10" y="12" width="1" height="1" fill="#FFFFFF"/>
+        <rect x="11" y="12" width="1" height="1" fill="#37291F"/>
+        <rect x="10" y="13" width="1" height="1" fill="#37291F"/>
+        <rect x="11" y="13" width="1" height="1" fill="#37291F"/>
+        <rect x="16" y="12" width="1" height="1" fill="#FFFFFF"/>
+        <rect x="17" y="12" width="1" height="1" fill="#37291F"/>
+        <rect x="16" y="13" width="1" height="1" fill="#37291F"/>
+        <rect x="17" y="13" width="1" height="1" fill="#37291F"/>
+      </g>
+      <g id="eyesClosed" style="display:none">
+        <rect x="10" y="13" width="2" height="1" fill="#37291F"/>
+        <rect x="16" y="13" width="2" height="1" fill="#37291F"/>
+      </g>
     </g>
   </g>
 </svg>

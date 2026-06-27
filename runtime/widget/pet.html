@@ -13,15 +13,15 @@
     position: fixed; inset: 0; width: 100%; height: 100%;
     border: 0; background: transparent; pointer-events: none;
   }
-  /* 两个缩放手柄：左上角 + 右下角（始终淡淡可见，悬停更亮） */
+  /* 缩放手柄：左上 + 右下角。平时隐藏，鼠标移到兔子上才淡入显形（不占画面） */
   .grip {
-    position: fixed; width: 36px; height: 36px;
-    -webkit-app-region: no-drag; pointer-events: auto;
-    opacity: .32; transition: opacity .15s; cursor: nwse-resize;
+    position: fixed; width: 50px; height: 50px;
+    -webkit-app-region: no-drag; pointer-events: auto; cursor: nwse-resize;
+    opacity: 0; transition: opacity .3s;
   }
-  body:hover .grip { opacity: .9; }
+  body.show-grips .grip { opacity: .85; }   /* 光标进入窗口时由主进程点亮 */
   .grip::after {
-    content: ""; position: absolute; width: 18px; height: 18px;
+    content: ""; position: absolute; width: 16px; height: 16px;
     background: repeating-linear-gradient(135deg, #FFC078 0 2px, transparent 2px 4px);
   }
   .grip.se { right: 0; bottom: 0; }
@@ -76,7 +76,8 @@
     });
 
     // ── Claude hook 驱动：切状态；happy/error/notification 闪几秒自动回 idle ──
-    const MOMENTARY = { happy: 3500, error: 3000, notification: 3000 };
+    // notification 不在此列：它要一直停留，由主进程探测到你动鼠标/键盘才转 idle
+    const MOMENTARY = { happy: 3500, error: 3000 };
     let revertTimer = null;
     function applyState(name) {
       if (!theme.states[name]) return;
@@ -85,6 +86,19 @@
       if (MOMENTARY[name]) revertTimer = setTimeout(() => setState(theme.default || keys[0]), MOMENTARY[name]);
     }
     ipcRenderer.on('pet-state', (e, name) => applyState(name));
+
+    // 光标在兔子窗口内时显示缩放手柄，移开则淡出
+    ipcRenderer.on('cursor-in', (e, inside) => document.body.classList.toggle('show-grips', inside));
+
+    // 眼球跟随：把光标方向写进 idle 的 --aim-x/y（只 idle 用这俩变量，其它状态不引用）
+    ipcRenderer.on('cursor-aim', (e, a) => {
+      if (current !== 'idle') return;
+      try {
+        const d = frame.contentDocument.documentElement;
+        d.style.setProperty('--aim-x', a.ax + 'px');
+        d.style.setProperty('--aim-y', a.ay + 'px');
+      } catch (e) {}
+    });
 
     // 拖角缩放：指针捕获保证 move/up 一定收到（不会卡）
     document.querySelectorAll('.grip').forEach((g) => {
