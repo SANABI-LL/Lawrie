@@ -1,6 +1,6 @@
 # Lawrie · 像素萝卜兔桌宠 🐰🥕
 
-一只用 [pet-forge](https://github.com/) SVG 路线做的**自定义像素风桌宠** —— 一只爱萝卜的兔子。每个状态都是一个**自包含的 `.svg.html`**（内联 SVG + CSS + JS，零依赖，双击即跑），整像素、硬边、跳帧的像素风。
+一只用 [pet-forge](https://github.com/SANABI-LL/pet-forge-2) SVG 路线做的**自定义像素风桌宠** —— 一只爱萝卜的兔子。每个状态都是一个**自包含的 `.svg.html`**（内联 SVG + CSS + JS，零依赖，双击即跑），整像素、硬边、跳帧的像素风。
 
 > 这个仓库是制作进度的存档，随时可以回来看做到哪了。
 
@@ -75,6 +75,15 @@ npm start          # 同步状态资源并启动挂件（开发用）
 - 造型用一张 28×28 的 ASCII `SPRITE` 字符图谱，JS 读图谱渲染成 1×1 `<rect>`（`.`透明 `O`描边 `W`毛 `P`粉 `B`肚皮）。改图谱即改造型。
 - 角色一致性靠跨状态复用同一套图谱。
 - `_archive/` 里是早期/被替换的版本（柴犬试做、thinking/error 的 v1）留作追溯。
+
+## License
+
+双轨授权:
+
+- **代码**(`runtime/widget/` 挂件、脚本、`.svg.html` 技术结构、配置)—— [MIT](LICENSE)。随便学、随便改去做你自己的桌宠。
+- **Lawrie 角色形象**(像素造型、配色、萝卜 motif、`rabbit-*.svg.html` 的视觉设计)—— © 2026 SANABI-LL,**保留版权**,详见 [ART-LICENSE.md](ART-LICENSE.md)。可运行、可学技法,但请不要照搬这只兔子去再发布。
+
+想做自己的桌宠?用[方法](https://github.com/SANABI-LL/pet-forge-2)而不是这只兔子——做一只有你自己视觉 DNA 的角色,这正是 pet-forge 的初衷。
 
 ---
 
