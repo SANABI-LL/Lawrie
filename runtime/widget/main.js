@@ -5,6 +5,7 @@ const { app, BrowserWindow, screen, ipcMain, powerMonitor } = require('electron'
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const theme = require('./theme.json');
 
 const MIN = 140, MAX = 640, DEFAULT = 220;
 const PORT = 4747;
@@ -49,14 +50,17 @@ function watchForUser() {
 let sleepTimer = null;
 const SLEEP_MS = 120000;
 function armSleep() { clearTimeout(sleepTimer); sleepTimer = setTimeout(() => pushState('sleeping'), SLEEP_MS); }
+// 干活中的状态（来自 theme.json 单一信息源）：Claude 正在思考/写代码/带子任务，期间可能长时间
+// 没有新 hook（长构建/测试），不能误判成空闲 → 这些状态下永不计睡眠计时。只有真正静止的态才计 2 分钟。
+const BUSY = new Set(theme.busy || []);
 
 function pushState(state) {
   if (!state || !win || win.isDestroyed()) return;
   win.webContents.send('pet-state', state);
   if (state === 'notification') watchForUser();   // 进通知 → 开始等用户回来
   else clearNotifWatch();                          // 任何别的状态 → 取消等待
-  if (state === 'sleeping') clearTimeout(sleepTimer); // 已睡，停止计时
-  else armSleep();                                    // 其它状态：重新计 2 分钟
+  if (state === 'sleeping' || BUSY.has(state)) clearTimeout(sleepTimer); // 已睡 / 干活中：不计睡眠
+  else armSleep();                                                       // 静止态：重新计 2 分钟
 }
 
 // 光标是否在窗口内 → 让渲染层显隐缩放手柄（绕开 app-region:drag 抓不到 hover）

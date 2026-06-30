@@ -75,9 +75,13 @@
       reRender = setTimeout(() => setState(current), 140);
     });
 
-    // ── Claude hook 驱动：切状态；happy/error/notification 闪几秒自动回 idle ──
-    // notification 不在此列：它要一直停留，由主进程探测到你动鼠标/键盘才转 idle
-    const MOMENTARY = { happy: 3500, error: 3000 };
+    // ── Claude hook 驱动：切状态；happy/error 闪几秒自动回 idle ──
+    // notification 不在此列：它要一直停留，由主进程探测到你动鼠标/键盘才转 idle。
+    // notification 只由真实的 Claude `Notification` hook（需要权限确认/用户输入时）触发，
+    // 不再用"typing 停滞超时"做客户端兜底 —— 那会把长构建/测试（几秒内没有新 hook）
+    // 误判成"等用户"。代价：bypass 权限模式下偶发的权限弹窗若没发 Notification hook，
+    // 兔子不会自动提示，但不会再写代码写一半莫名变 notification。
+    const MOMENTARY = theme.momentary || {};   // 瞬时态→停留毫秒，来自 theme.json 单一信息源
     let revertTimer = null;
     function applyState(name) {
       if (!theme.states[name]) return;
