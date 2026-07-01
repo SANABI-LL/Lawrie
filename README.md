@@ -30,6 +30,21 @@
 
 <sub>静态预览（`previews/`）。想看动效：开 GitHub Pages 后进总览页，或双击任意 `rabbit-*.svg.html`。</sub>
 
+## 一键接入 Claude Code
+
+在 Claude Code 里输入这两行：
+
+```
+/plugin marketplace add SANABI-LL/Lawrie
+/plugin install lawrie-pet@lawrie
+```
+
+装好后**重开 Claude Code**，兔子就自动出现、跟着你干活换状态了 —— 全程不用碰任何配置文件。
+
+- 首次会自动下载挂件（约 70MB，一次性），下载完兔子就蹦出来。
+- 不想要了：`/plugin uninstall lawrie-pet@lawrie`，hooks 一起干净移除。
+- 目前挂件是 **Windows** 的；macOS / Linux 见下方「手动接入 / 其他平台」。
+
 ## 在线预览
 
 开了 GitHub Pages 后，直接打开总览页一眼看全部状态的动效：
@@ -95,7 +110,10 @@ npm start          # 同步状态资源并启动挂件（开发用）
 | SubagentStart / Stop | carrying / typing |
 | Notification、Stop（答完） | notification |
 
-### 怎么接上 Claude Code（手把手 · 非码农也能做）
+<details>
+<summary><b>手动接入 / 其他平台</b>（不用 plugin 时展开 · 非码农也能做）</summary>
+
+> 大多数人用上面的「一键接入」就够了。这里是不想装 plugin、或 macOS/Linux 用户的手动方案。
 
 hook 配置模板在 [`runtime/widget/hooks.example.json`](runtime/widget/hooks.example.json)。下面是把它接通的完整步骤（Windows）：
 
@@ -153,6 +171,8 @@ hook 配置模板在 [`runtime/widget/hooks.example.json`](runtime/widget/hooks.
 - 兔子没出现 → 先手动双击 `Lawrie.exe` 确认它自己能开；能开就说明是第 1 步的路径没填对。
 - 兔子开着但不换表情 → 多半是 `settings.json` 格式错了（少了逗号/括号）。把内容贴到任意"JSON 校验"网站检查一下。
 - 状态乱跳 → 确认端口 4747 没被别的程序占用。
+
+</details>
 
 ## 制作说明
 

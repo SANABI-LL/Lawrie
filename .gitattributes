@@ -1,0 +1,2 @@
+# 保证 shell 脚本永远用 LF 行尾——CRLF 会让 Windows 上的 bash 报 `\r` 错
+*.sh text eol=lf

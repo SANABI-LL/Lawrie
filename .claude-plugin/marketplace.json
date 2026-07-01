@@ -1,0 +1,23 @@
+{
+  "name": "lawrie",
+  "id": "lawrie",
+  "owner": {
+    "name": "SANABI-LL"
+  },
+  "metadata": {
+    "description": "Lawrie — 像素萝卜兔桌宠，跟着 Claude Code 实时换状态",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "lawrie-pet",
+      "source": "./",
+      "description": "桌面像素兔挂件，接 Claude Code 生命周期事件（thinking / typing / error / notification…）。首次会话自动下载挂件。Windows。",
+      "version": "1.0.0",
+      "author": {
+        "name": "SANABI-LL"
+      },
+      "keywords": ["desktop-pet", "widget", "fun", "pixel-art"]
+    }
+  ]
+}

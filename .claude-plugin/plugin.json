@@ -1,0 +1,12 @@
+{
+  "name": "lawrie-pet",
+  "description": "Lawrie 桌面像素兔挂件 —— 通过 hooks 跟着 Claude Code 生命周期事件实时换状态。首次会话自动下载挂件（Windows）。",
+  "version": "1.0.0",
+  "author": {
+    "name": "SANABI-LL"
+  },
+  "homepage": "https://github.com/SANABI-LL/Lawrie",
+  "repository": "https://github.com/SANABI-LL/Lawrie",
+  "license": "MIT",
+  "keywords": ["desktop-pet", "widget", "fun", "pixel-art"]
+}

@@ -1,0 +1,32 @@
+{
+  "description": "Lawrie 桌宠 —— 把 Claude Code 生命周期事件映射成挂件状态（本地 127.0.0.1:4747）",
+  "hooks": {
+    "SessionStart": [
+      { "matcher": "", "hooks": [ { "type": "command", "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/launch.sh\"" } ] }
+    ],
+    "UserPromptSubmit": [
+      { "matcher": "", "hooks": [ { "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/thinking || exit 0" } ] }
+    ],
+    "PreToolUse": [
+      { "matcher": "", "hooks": [ { "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/typing || exit 0" } ] }
+    ],
+    "PostToolUse": [
+      { "matcher": "", "hooks": [ { "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/typing || exit 0" } ] }
+    ],
+    "PostToolUseFailure": [
+      { "matcher": "", "hooks": [ { "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/error || exit 0" } ] }
+    ],
+    "Notification": [
+      { "matcher": "", "hooks": [ { "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/notification || exit 0" } ] }
+    ],
+    "SubagentStart": [
+      { "matcher": "", "hooks": [ { "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/carrying || exit 0" } ] }
+    ],
+    "SubagentStop": [
+      { "matcher": "", "hooks": [ { "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/typing || exit 0" } ] }
+    ],
+    "Stop": [
+      { "matcher": "", "hooks": [ { "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/notification || exit 0" } ] }
+    ]
+  }
+}
