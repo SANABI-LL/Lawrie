@@ -1,8 +1,34 @@
 # Lawrie · 像素萝卜兔桌宠 🐰🥕
 
+[![Latest release](https://img.shields.io/github/v/release/SANABI-LL/Lawrie?label=release&color=F0913C)](https://github.com/SANABI-LL/Lawrie/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/SANABI-LL/Lawrie/total?label=downloads&color=7FBF4F)](https://github.com/SANABI-LL/Lawrie/releases)
+[![Code: MIT](https://img.shields.io/badge/code-MIT-blue)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Windows-0078D6)](#怎么跑)
+
 一只用 [pet-forge](https://github.com/SANABI-LL/pet-forge-2) SVG 路线做的**自定义像素风桌宠** —— 一只爱萝卜的兔子。每个状态都是一个**自包含的 `.svg.html`**（内联 SVG + CSS + JS，零依赖，双击即跑），整像素、硬边、跳帧的像素风。
 
 > 这个仓库是制作进度的存档，随时可以回来看做到哪了。
+
+**⬇️ 直接用**：到 [Releases](https://github.com/SANABI-LL/Lawrie/releases/latest) 下载 `Lawrie-*-win-x64.exe`，双击即跑（Windows）。
+
+## 状态一览
+
+<table>
+  <tr>
+    <td align="center"><img src="previews/idle.png" width="104" alt="idle"><br><sub>idle</sub></td>
+    <td align="center"><img src="previews/typing.png" width="104" alt="typing"><br><sub>typing</sub></td>
+    <td align="center"><img src="previews/thinking.png" width="104" alt="thinking"><br><sub>thinking</sub></td>
+    <td align="center"><img src="previews/sleeping.png" width="104" alt="sleeping"><br><sub>sleeping</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="previews/happy.png" width="104" alt="happy"><br><sub>happy</sub></td>
+    <td align="center"><img src="previews/error.png" width="104" alt="error"><br><sub>error</sub></td>
+    <td align="center"><img src="previews/notification.png" width="104" alt="notification"><br><sub>notification</sub></td>
+    <td align="center"><img src="previews/carrying.png" width="104" alt="carrying"><br><sub>carrying</sub></td>
+  </tr>
+</table>
+
+<sub>静态预览（`previews/`）。想看动效：开 GitHub Pages 后进总览页，或双击任意 `rabbit-*.svg.html`。</sub>
 
 ## 在线预览
 
@@ -54,6 +80,9 @@ npm install
 npm start          # 同步状态资源并启动挂件（开发用）
 # 或 npm run dist   # 打包成桌面可执行文件
 ```
+
+> **平台说明**：预打包的 exe 和上面的 hook 拉起命令（`explorer.exe`）是 **Windows** 的。
+> **macOS / Linux** 用户可以从源码跑：`npm start` 直接看挂件（Electron 跨平台）；要接 Claude Code，把 `hooks.example.json` 里 `SessionStart` 的拉起命令换成你系统的等价物——macOS 用 `open -a "/路径/Lawrie.app" || exit 0`，Linux 直接写可执行文件路径 `/路径/lawrie &`（其余 `curl` 那几行跨平台通用，不用改）。打包到 mac/linux 需在 `runtime/widget/package.json` 的 `build.win` 旁加 `mac` / `linux` target 再 `npm run dist`。
 
 **实时联动原理**：挂件在 `127.0.0.1:4747` 起一个本地 HTTP 服务，`GET /<状态名>` 就把兔子切到对应状态。再通过 Claude Code 的 [hooks](https://docs.claude.com/en/docs/claude-code/hooks) 把生命周期事件映射成对这个端口的请求，于是 Claude 一边干活，兔子一边自己换表情：
 
