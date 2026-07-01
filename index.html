@@ -49,14 +49,34 @@
       ["rabbit-carrying.svg.html",    "carrying 大哥", "墨镜 + 举拳 + 长萝卜剑 + 嘚瑟晃 + 扫光"],
     ];
     const grid = document.getElementById("grid");
+    // 让每个状态的像素兔按卡片大小缩放，完整落在框内（默认 --pixel-size 是 360px，会溢出）
+    function fit(iframe) {
+      try {
+        const d = iframe.contentDocument;
+        const w = iframe.clientWidth || 240;
+        d.documentElement.style.setProperty('--pixel-size', Math.round(w * 0.72) + 'px', 'important');
+        d.documentElement.style.background = 'transparent';
+        d.body.style.background = 'transparent';
+        d.documentElement.style.overflow = 'hidden';
+        d.body.style.overflow = 'hidden';
+      } catch (e) { /* file:// 跨源访问会被拦，Pages(https 同源)下正常 */ }
+    }
     for (const [file, name, desc] of states) {
       const card = document.createElement("div");
       card.className = "card";
-      card.innerHTML =
-        '<iframe loading="lazy" src="' + file + '" title="' + name + '"></iframe>' +
-        '<div class="meta"><div class="name">' + name + '</div>' +
-        '<div class="desc">' + desc + '</div></div>';
+      const iframe = document.createElement("iframe");
+      iframe.loading = "lazy";
+      iframe.title = name;
+      iframe.addEventListener("load", () => fit(iframe));
+      iframe.src = file;
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      meta.innerHTML = '<div class="name">' + name + '</div><div class="desc">' + desc + '</div>';
+      card.appendChild(iframe);
+      card.appendChild(meta);
       grid.appendChild(card);
+      // 窗口尺寸变化时重新贴合
+      window.addEventListener("resize", () => fit(iframe));
     }
   </script>
 </body>
