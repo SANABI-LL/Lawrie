@@ -1,5 +1,7 @@
 # Lawrie · 像素萝卜兔桌宠 🐰🥕
 
+[English](README.en.md) | 中文
+
 [![Latest release](https://img.shields.io/github/v/release/SANABI-LL/Lawrie?label=release&color=F0913C)](https://github.com/SANABI-LL/Lawrie/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/SANABI-LL/Lawrie/total?label=downloads&color=7FBF4F)](https://github.com/SANABI-LL/Lawrie/releases)
 [![Code: MIT](https://img.shields.io/badge/code-MIT-blue)](LICENSE)
