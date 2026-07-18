@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:,">
+<title>my-pet · 像素兔 · greeting</title>
+<style>
+  /*
+    像素兔桌宠 · greeting 状态（打招呼 · momentary 瞬时态）
+    ─────────────────────────────────────────────
+    复用 happy 的下移站立图谱（留头顶空间），叠加：
+      · 右臂高举左右挥动（双帧瞬切）
+      · 左爪捧一根小萝卜出场敬礼（motif：萝卜）
+      · 弯弯 ^^ 笑眼 + 小笑嘴 + 腮红
+      · 轻快小蹦（比 happy 温和）
+    文件内部是 A 类循环；runtime 按 theme.json momentary 3s 自动回 idle。
+    整像素、硬边、跳帧。
+  */
+
+  :root {
+    --hop-period: 0.72s;
+    --wave-period: 0.56s;
+    --pixel-size: 360px;
+    --bg: #20283A;
+  }
+
+  html, body { margin: 0; min-height: 100vh; background: var(--bg); }
+  body { display: grid; min-height: 100vh; place-items: center;
+         font-family: "VT323", "Press Start 2P", ui-monospace, monospace; }
+
+  #stage {
+    width: var(--pixel-size); height: var(--pixel-size);
+    image-rendering: pixelated; shape-rendering: crispEdges; display: block;
+  }
+
+  /* 轻快小蹦：整像素跳帧 */
+  #greet {
+    transform-box: fill-box; transform-origin: center bottom;
+    animation: hop var(--hop-period) infinite;
+  }
+  @keyframes hop {
+    0%, 49.9%  { transform: translateY(0); }
+    50%, 99.9% { transform: translateY(-1px); }
+  }
+
+  /* 阴影随小蹦轻缩 */
+  #shadow { transform-box: fill-box; transform-origin: center;
+            animation: shadowHop var(--hop-period) infinite; }
+  @keyframes shadowHop {
+    0%, 49.9%  { transform: scaleX(1);    opacity: 0.2; }
+    50%, 99.9% { transform: scaleX(0.85); opacity: 0.14; }
+  }
+
+  /* 挥手：双帧瞬切（A 帧收 / B 帧甩出去） */
+  #waveA { animation: wvA var(--wave-period) infinite; }
+  #waveB { animation: wvB var(--wave-period) infinite; }
+  @keyframes wvA { 0%, 49.9% { opacity: 1; } 50%, 99.9% { opacity: 0; } 100% { opacity: 1; } }
+  @keyframes wvB { 0%, 49.9% { opacity: 0; } 50%, 99.9% { opacity: 1; } 100% { opacity: 0; } }
+
+</style>
+</head>
+<body>
+
+
+<svg id="stage" viewBox="0 0 28 28" role="img" aria-label="一只举爪挥手打招呼、捧着小萝卜敬礼的像素兔" xmlns="http://www.w3.org/2000/svg">
+  <rect id="shadow" x="8" y="26" width="12" height="1" fill="#000000" opacity="0.2"/>
+
+  <g id="greet">
+    <g id="body"></g>
+
+    <!-- 左爪捧小萝卜出场（敬礼）：位置在身侧腰间，爪子从描边探出 -->
+    <g id="present">
+      <rect x="4" y="14" width="1" height="1" fill="#7FBF4F"/><rect x="5" y="14" width="1" height="1" fill="#4E8A33"/>
+      <rect x="4" y="15" width="1" height="1" fill="#F0913C"/><rect x="5" y="15" width="1" height="1" fill="#F0913C"/>
+      <rect x="4" y="16" width="1" height="1" fill="#F0913C"/><rect x="5" y="16" width="1" height="1" fill="#C96A22"/>
+      <rect x="5" y="17" width="1" height="1" fill="#C96A22"/>
+      <!-- 扶着萝卜的左爪 -->
+      <rect x="6" y="16" width="1" height="1" fill="#F5EFE4"/>
+      <rect x="6" y="17" width="1" height="1" fill="#F5EFE4"/>
+    </g>
+
+    <!-- 挥动的右臂 · A 帧（举直） -->
+    <g id="waveA">
+      <rect x="21" y="18" width="1" height="1" fill="#F5EFE4"/><rect x="22" y="18" width="1" height="1" fill="#5A4A3F"/>
+      <rect x="22" y="17" width="1" height="1" fill="#F5EFE4"/><rect x="23" y="17" width="1" height="1" fill="#5A4A3F"/>
+      <rect x="23" y="16" width="1" height="1" fill="#F5EFE4"/><rect x="24" y="16" width="1" height="1" fill="#5A4A3F"/>
+      <rect x="23" y="15" width="1" height="1" fill="#F5EFE4"/><rect x="24" y="15" width="1" height="1" fill="#5A4A3F"/>
+      <rect x="23" y="14" width="1" height="1" fill="#5A4A3F"/><rect x="24" y="14" width="1" height="1" fill="#5A4A3F"/>
+      <rect x="22" y="13" width="1" height="1" fill="#5A4A3F"/><rect x="23" y="13" width="2" height="1" fill="#F5EFE4"/><rect x="25" y="13" width="1" height="1" fill="#5A4A3F"/>
+      <rect x="22" y="12" width="1" height="1" fill="#5A4A3F"/><rect x="23" y="12" width="2" height="1" fill="#F5EFE4"/><rect x="25" y="12" width="1" height="1" fill="#5A4A3F"/>
+      <rect x="23" y="11" width="2" height="1" fill="#5A4A3F"/>
+    </g>
+    <!-- 挥动的右臂 · B 帧（向外甩 1 像素） -->
+    <g id="waveB">
+      <rect x="21" y="18" width="1" height="1" fill="#F5EFE4"/><rect x="22" y="18" width="1" height="1" fill="#5A4A3F"/>
+      <rect x="22" y="17" width="1" height="1" fill="#F5EFE4"/><rect x="23" y="17" width="1" height="1" fill="#5A4A3F"/>
+      <rect x="23" y="16" width="1" height="1" fill="#F5EFE4"/><rect x="24" y="16" width="1" height="1" fill="#5A4A3F"/>
+      <rect x="23" y="15" width="1" height="1" fill="#F5EFE4"/><rect x="24" y="15" width="1" height="1" fill="#5A4A3F"/>
+      <rect x="24" y="14" width="1" height="1" fill="#5A4A3F"/><rect x="25" y="14" width="1" height="1" fill="#5A4A3F"/>
+      <rect x="23" y="13" width="1" height="1" fill="#5A4A3F"/><rect x="24" y="13" width="2" height="1" fill="#F5EFE4"/><rect x="26" y="13" width="1" height="1" fill="#5A4A3F"/>
+      <rect x="23" y="12" width="1" height="1" fill="#5A4A3F"/><rect x="24" y="12" width="2" height="1" fill="#F5EFE4"/><rect x="26" y="12" width="1" height="1" fill="#5A4A3F"/>
+      <rect x="24" y="11" width="2" height="1" fill="#5A4A3F"/>
+    </g>
+
+    <!-- 打招呼的脸：弯弯 ^^ 笑眼 / 小笑嘴 / 腮红 -->
+    <g id="face">
+      <rect x="9"  y="14" width="1" height="1" fill="#3C2E28"/><rect x="10" y="13" width="2" height="1" fill="#3C2E28"/><rect x="12" y="14" width="1" height="1" fill="#3C2E28"/>
+      <rect x="15" y="14" width="1" height="1" fill="#3C2E28"/><rect x="16" y="13" width="2" height="1" fill="#3C2E28"/><rect x="18" y="14" width="1" height="1" fill="#3C2E28"/>
+      <rect x="12" y="16" width="1" height="1" fill="#D88A93"/><rect x="15" y="16" width="1" height="1" fill="#D88A93"/><rect x="13" y="17" width="2" height="1" fill="#D88A93"/>
+      <rect x="8"  y="15" width="1" height="2" fill="#F48C96"/>
+      <rect x="19" y="15" width="1" height="2" fill="#F48C96"/>
+    </g>
+
+    <!-- 口袋 + 萝卜缨（角色 DNA） -->
+    <g id="pocket">
+      <rect x="13" y="20" width="1" height="1" fill="#7FBF4F"/><rect x="14" y="20" width="1" height="1" fill="#4E8A33"/>
+      <rect x="11" y="21" width="1" height="1" fill="#5A4A3F"/><rect x="12" y="21" width="4" height="1" fill="#EADBC6"/><rect x="16" y="21" width="1" height="1" fill="#5A4A3F"/>
+      <rect x="11" y="22" width="1" height="1" fill="#5A4A3F"/><rect x="12" y="22" width="4" height="1" fill="#EADBC6"/><rect x="16" y="22" width="1" height="1" fill="#5A4A3F"/>
+    </g>
+  </g>
+</svg>
+
+<script>
+  /* ─── 站立兔图谱（同 happy：整只下移2行留头顶空间·肚子缩短）。28×28。 ─── */
+  const SPRITE = [
+    "............................",
+    "............................",
+    "............................",
+    "........OWWWO..OWWWO........",
+    "........OWPWO..OWPWO........",
+    "........OWPWO..OWPWO........",
+    "........OWPWO..OWPWO........",
+    "........OWPWO..OWPWO........",
+    "........OWWWO..OWWWO........",
+    "........OWWWO..OWWWO........",
+    "......OOWWWWWWWWWWWWOO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OOWWWWWWWWWWWWOO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWBBBBBBBBWWWO......",
+    "......OWWWWBBBBBBWWWWO......",
+    "......OOWWWWWWWWWWWWOO......",
+    "........OWWWO..OWWWO........",
+    "........OOOOO..OOOOO........",
+    "............................",
+    "............................"
+  ];
+  const PALETTE = { O:"#5A4A3F", W:"#F5EFE4", P:"#F4A7B6", B:"#FFFBF4" };
+
+  const SVGNS = "http://www.w3.org/2000/svg";
+  const bodyG = document.getElementById("body");
+  SPRITE.forEach((row, y) => {
+    for (let x = 0; x < row.length; x++) {
+      const c = row[x];
+      if (c === "." || !PALETTE[c]) continue;
+      const r = document.createElementNS(SVGNS, "rect");
+      r.setAttribute("x", x); r.setAttribute("y", y);
+      r.setAttribute("width", 1); r.setAttribute("height", 1);
+      r.setAttribute("fill", PALETTE[c]);
+      bodyG.appendChild(r);
+    }
+  });
+</script>
+
+</body>
+</html>

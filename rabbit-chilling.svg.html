@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:,">
+<title>my-pet · 像素兔 · chilling</title>
+<style>
+  /*
+    像素兔桌宠 · chilling 状态（摸鱼听歌 · A 类循环 · 手动彩蛋）
+    ─────────────────────────────────────────────
+    设定：戴上耳机听歌摸鱼，跟着节拍摇头晃脑。
+      · 黑色耳机：头带从双耳之间绕过 + 两侧耳罩（黄点缀）
+      · 眯眯眼陶醉脸 + 惬意小嘴
+      · 身体随节拍左右摇（横向 1px 跳帧）+ 呼吸 bob（周期错开=活物感）
+      · 两侧音符一格一格往上飘、渐隐（左右错拍）
+    不接 hook，手动 curl /chilling 触发；busy 态不被睡眠打断。
+    整像素、硬边、跳帧。
+  */
+
+  :root {
+    --bob-period: 1.1s;
+    --sway-period: 1.8s;
+    --pixel-size: 360px;
+    --bg: #20283A;
+  }
+
+  html, body { margin: 0; min-height: 100vh; background: var(--bg); }
+  body { display: grid; min-height: 100vh; place-items: center;
+         font-family: "VT323", "Press Start 2P", ui-monospace, monospace; }
+
+  #stage {
+    width: var(--pixel-size); height: var(--pixel-size);
+    image-rendering: pixelated; shape-rendering: crispEdges; display: block;
+  }
+
+  /* 呼吸 bob（竖直） */
+  #pet { animation: bob var(--bob-period) infinite; }
+  @keyframes bob {
+    0%, 49.9%  { transform: translateY(0); }
+    50%, 99.9% { transform: translateY(-1px); }
+  }
+
+  /* 节拍摇摆（水平，周期与 bob 故意错开） */
+  #sway { animation: sway var(--sway-period) infinite; }
+  @keyframes sway {
+    0%, 24.9%  { transform: translateX(0); }
+    25%, 49.9% { transform: translateX(-1px); }
+    50%, 74.9% { transform: translateX(0); }
+    75%, 99.9% { transform: translateX(1px); }
+    100%       { transform: translateX(0); }
+  }
+
+  /* 音符：整像素上飘 + 瞬切渐隐，左右错拍（默认隐身，防 delay 期间静帧残影） */
+  #noteR, #noteL { opacity: 0; }
+  #noteR { animation: rise 2.2s infinite; }
+  #noteL { animation: rise 2.6s infinite; animation-delay: 1.1s; }
+  @keyframes rise {
+    0%, 4.9%   { transform: translateY(0);    opacity: 0; }
+    5%, 19.9%  { transform: translateY(0);    opacity: 1; }
+    20%, 39.9% { transform: translateY(-1px); opacity: 1; }
+    40%, 59.9% { transform: translateY(-2px); opacity: 1; }
+    60%, 79.9% { transform: translateY(-3px); opacity: 1; }
+    80%, 94.9% { transform: translateY(-4px); opacity: 1; }
+    95%, 100%  { transform: translateY(-5px); opacity: 0; }
+  }
+
+</style>
+</head>
+<body>
+
+
+<svg id="stage" viewBox="0 0 28 28" role="img" aria-label="一只戴耳机听歌摇头晃脑摸鱼的像素兔" xmlns="http://www.w3.org/2000/svg">
+  <rect id="shadow" x="8" y="27" width="12" height="1" fill="#000000" opacity="0.16"/>
+
+  <!-- 音符：飘在身体两侧（不随摇摆） -->
+  <g id="noteR">
+    <rect x="24" y="14" width="1" height="1" fill="#FFE082"/>
+    <rect x="25" y="12" width="1" height="1" fill="#3C2E28"/>
+    <rect x="25" y="13" width="1" height="1" fill="#3C2E28"/>
+  </g>
+  <g id="noteL">
+    <rect x="3" y="16" width="1" height="1" fill="#FFE082"/>
+    <rect x="4" y="14" width="1" height="1" fill="#3C2E28"/>
+    <rect x="4" y="15" width="1" height="1" fill="#3C2E28"/>
+  </g>
+
+  <g id="pet">
+    <g id="sway">
+      <g id="ears"></g>
+      <g id="body"></g>
+
+      <!-- 耳机：头带绕过双耳之间 + 两侧耳罩 -->
+      <g id="headphones">
+        <!-- 左弧 -->
+        <rect x="4" y="9" width="1" height="1" fill="#1A1D28"/>
+        <rect x="5" y="8" width="1" height="1" fill="#1A1D28"/>
+        <rect x="6" y="7" width="1" height="1" fill="#1A1D28"/>
+        <rect x="7" y="7" width="1" height="1" fill="#1A1D28"/>
+        <!-- 双耳之间跨过头顶 -->
+        <rect x="13" y="6" width="2" height="1" fill="#1A1D28"/>
+        <!-- 右弧 -->
+        <rect x="20" y="7" width="1" height="1" fill="#1A1D28"/>
+        <rect x="21" y="7" width="1" height="1" fill="#1A1D28"/>
+        <rect x="22" y="8" width="1" height="1" fill="#1A1D28"/>
+        <rect x="23" y="9" width="1" height="1" fill="#1A1D28"/>
+        <!-- 左耳罩（黄点缀） -->
+        <rect x="4" y="10" width="2" height="1" fill="#1A1D28"/>
+        <rect x="4" y="11" width="1" height="1" fill="#1A1D28"/><rect x="5" y="11" width="1" height="1" fill="#FFE082"/>
+        <rect x="4" y="12" width="2" height="1" fill="#1A1D28"/>
+        <rect x="4" y="13" width="2" height="1" fill="#1A1D28"/>
+        <!-- 右耳罩 -->
+        <rect x="22" y="10" width="2" height="1" fill="#1A1D28"/>
+        <rect x="22" y="11" width="1" height="1" fill="#FFE082"/><rect x="23" y="11" width="1" height="1" fill="#1A1D28"/>
+        <rect x="22" y="12" width="2" height="1" fill="#1A1D28"/>
+        <rect x="22" y="13" width="2" height="1" fill="#1A1D28"/>
+      </g>
+
+      <!-- 陶醉脸：眯眯眼 + 惬意小嘴 -->
+      <g id="face">
+        <rect x="9"  y="13" width="1" height="1" fill="#3C2E28"/><rect x="10" y="12" width="2" height="1" fill="#3C2E28"/><rect x="12" y="13" width="1" height="1" fill="#3C2E28"/>
+        <rect x="15" y="13" width="1" height="1" fill="#3C2E28"/><rect x="16" y="12" width="2" height="1" fill="#3C2E28"/><rect x="18" y="13" width="1" height="1" fill="#3C2E28"/>
+        <rect x="13" y="16" width="2" height="1" fill="#D88A93"/>
+      </g>
+
+      <!-- 口袋 + 萝卜缨（角色 DNA） -->
+      <g id="carrotRest">
+        <rect x="13" y="18" width="1" height="1" fill="#7FBF4F"/>
+        <rect x="12" y="19" width="1" height="1" fill="#4E8A33"/>
+        <rect x="13" y="19" width="1" height="1" fill="#7FBF4F"/>
+        <rect x="14" y="19" width="1" height="1" fill="#4E8A33"/>
+      </g>
+      <g id="pocketFlap">
+        <rect x="11" y="20" width="6" height="1" fill="#5A4A3F"/>
+        <rect x="11" y="21" width="1" height="2" fill="#5A4A3F"/>
+        <rect x="16" y="21" width="1" height="2" fill="#5A4A3F"/>
+        <rect x="12" y="21" width="4" height="2" fill="#EADBC6"/>
+      </g>
+    </g>
+  </g>
+</svg>
+
+<script>
+  /* ─── 站立兔图谱（同 idle 标准位）。28×28。 ─── */
+  const SPRITE = [
+    "............................",
+    "........OWWWO..OWWWO........",
+    "........OWPWO..OWPWO........",
+    "........OWPWO..OWPWO........",
+    "........OWPWO..OWPWO........",
+    "........OWPWO..OWPWO........",
+    "........OWWWO..OWWWO........",
+    "........OWWWO..OWWWO........",
+    "......OOWWWWWWWWWWWWOO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWPPWWWWWWO......",
+    "......OWPWWWWWWWWWWPWO......",
+    "......OOWWWWWWWWWWWWOO......",
+    "......OOWWWWWWWWWWWWOO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWBBBBBBBBWWWO......",
+    "......OWWWBBBBBBBBWWWO......",
+    "......OWWWBBBBBBBBWWWO......",
+    "......OWWWWBBBBBBWWWWO......",
+    "......OOWWWWWWWWWWWWOO......",
+    "........OWWWO..OWWWO........",
+    "........OWWWO..OWWWO........",
+    "........OOOOO..OOOOO........",
+    "............................"
+  ];
+  const PALETTE = { O:"#5A4A3F", W:"#F5EFE4", B:"#FFFBF4", P:"#F4A7B6" };
+
+  const SVGNS = "http://www.w3.org/2000/svg";
+  const earsG = document.getElementById("ears");
+  const bodyG = document.getElementById("body");
+  SPRITE.forEach((row, y) => {
+    for (let x = 0; x < row.length; x++) {
+      const c = row[x];
+      if (c === "." || !PALETTE[c]) continue;
+      const r = document.createElementNS(SVGNS, "rect");
+      r.setAttribute("x", x); r.setAttribute("y", y);
+      r.setAttribute("width", 1); r.setAttribute("height", 1);
+      r.setAttribute("fill", PALETTE[c]);
+      (y < 8 ? earsG : bodyG).appendChild(r);
+    }
+  });
+
+  // ── 偶尔耳朵抖一下（沉浸在音乐里）──
+  function earFlick(ms) {
+    earsG.style.transform = "translateY(1px)";
+    setTimeout(() => { earsG.style.transform = ""; }, ms);
+  }
+  (function scheduleEar() {
+    setTimeout(() => { earFlick(160); scheduleEar(); }, 4000 + Math.random() * 5000);
+  })();
+</script>
+
+</body>
+</html>

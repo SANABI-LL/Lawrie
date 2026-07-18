@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:,">
+<title>my-pet · 像素兔 · searching</title>
+<style>
+  /*
+    像素兔桌宠 · searching 状态（翻找 · A 类循环 · busy）
+    ─────────────────────────────────────────────
+    设定：口袋空了！兔子举着放大镜在地上来回找萝卜。
+      · 右爪持放大镜（描边圈 + 浅蓝镜片 + 高光），贴地左右扫（整像素跳）
+      · 眼睛看下方，瞳孔随放大镜同相位左右瞟
+      · 镜片里偶尔闪现一截小萝卜（motif 彩蛋）
+      · 口袋是空的 —— 萝卜缨不在（找的就是它）
+    对应 Claude 检索类工具（Grep/Glob/WebSearch/WebFetch）。
+    整像素、硬边、跳帧。
+  */
+
+  :root {
+    --sweep-period: 2.6s;
+    --bob-period: 1.3s;
+    --pixel-size: 360px;
+    --bg: #20283A;
+  }
+
+  html, body { margin: 0; min-height: 100vh; background: var(--bg); }
+  body { display: grid; min-height: 100vh; place-items: center;
+         font-family: "VT323", "Press Start 2P", ui-monospace, monospace; }
+
+  #stage {
+    width: var(--pixel-size); height: var(--pixel-size);
+    image-rendering: pixelated; shape-rendering: crispEdges; display: block;
+  }
+
+  /* 专注微 bob */
+  #pet { animation: bob var(--bob-period) infinite; }
+  @keyframes bob {
+    0%, 49.9%  { transform: translateY(0); }
+    50%, 99.9% { transform: translateY(-1px); }
+  }
+
+  /* 整兔左右踱步找：横向整像素平台跳（镜子随身走，不脱手） */
+  #pace { animation: pace var(--sweep-period) infinite; }
+  @keyframes pace {
+    0%, 19.9%  { transform: translateX(0); }
+    20%, 44.9% { transform: translateX(-1px); }
+    45%, 59.9% { transform: translateX(0); }
+    60%, 84.9% { transform: translateX(1px); }
+    85%, 100%  { transform: translateX(0); }
+  }
+
+  /* 镜片里闪现的小萝卜：只在左侧停留时现身一瞬 */
+  #lensCarrot { animation: flash var(--sweep-period) infinite; }
+  @keyframes flash {
+    0%, 27.9%  { opacity: 0; }
+    28%, 40.9% { opacity: 1; }
+    41%, 100%  { opacity: 0; }
+  }
+
+</style>
+</head>
+<body>
+
+
+<svg id="stage" viewBox="0 0 28 28" role="img" aria-label="一只举着放大镜贴地来回找萝卜的像素兔" xmlns="http://www.w3.org/2000/svg">
+  <rect id="shadow" x="8" y="27" width="12" height="1" fill="#000000" opacity="0.16"/>
+
+  <g id="pet">
+    <g id="pace">
+    <g id="body"></g>
+
+    <!-- 眼睛：标准圆眼（左上高光），专注盯镜 -->
+    <g id="eyes">
+      <rect x="10" y="12" width="1" height="1" fill="#FFFFFF"/>
+      <rect x="11" y="12" width="1" height="1" fill="#37291F"/>
+      <rect x="10" y="13" width="1" height="1" fill="#37291F"/>
+      <rect x="11" y="13" width="1" height="1" fill="#37291F"/>
+      <rect x="16" y="12" width="1" height="1" fill="#FFFFFF"/>
+      <rect x="17" y="12" width="1" height="1" fill="#37291F"/>
+      <rect x="16" y="13" width="1" height="1" fill="#37291F"/>
+      <rect x="17" y="13" width="1" height="1" fill="#37291F"/>
+    </g>
+
+    <!-- 空口袋（萝卜缨不见了 —— 找的就是它） -->
+    <g id="pocketFlap">
+      <rect x="11" y="20" width="6" height="1" fill="#5A4A3F"/>
+      <rect x="11" y="21" width="1" height="2" fill="#5A4A3F"/>
+      <rect x="16" y="21" width="1" height="2" fill="#5A4A3F"/>
+      <rect x="12" y="21" width="4" height="2" fill="#EADBC6"/>
+    </g>
+
+    <!-- 右臂 + 放大镜（随整兔踱步，不脱手） -->
+    <g id="glass">
+      <!-- 从身侧探出的右爪（描边收口） -->
+      <rect x="22" y="15" width="1" height="1" fill="#5A4A3F"/><rect x="23" y="15" width="1" height="1" fill="#5A4A3F"/>
+      <rect x="22" y="16" width="1" height="1" fill="#F5EFE4"/><rect x="23" y="16" width="1" height="1" fill="#F5EFE4"/>
+      <rect x="24" y="16" width="1" height="1" fill="#5A4A3F"/>
+      <!-- 镜柄 -->
+      <rect x="23" y="17" width="1" height="1" fill="#5A4A3F"/>
+      <!-- 镜圈（描边） -->
+      <rect x="21" y="18" width="3" height="1" fill="#5A4A3F"/>
+      <rect x="20" y="19" width="1" height="1" fill="#5A4A3F"/><rect x="24" y="19" width="1" height="1" fill="#5A4A3F"/>
+      <rect x="20" y="20" width="1" height="1" fill="#5A4A3F"/><rect x="24" y="20" width="1" height="1" fill="#5A4A3F"/>
+      <rect x="20" y="21" width="1" height="1" fill="#5A4A3F"/><rect x="24" y="21" width="1" height="1" fill="#5A4A3F"/>
+      <rect x="21" y="22" width="3" height="1" fill="#5A4A3F"/>
+      <!-- 镜片 + 高光 -->
+      <rect x="21" y="19" width="3" height="1" fill="#AED4F0"/>
+      <rect x="21" y="20" width="3" height="1" fill="#AED4F0"/>
+      <rect x="21" y="21" width="3" height="1" fill="#AED4F0"/>
+      <rect x="21" y="19" width="1" height="1" fill="#FFFFFF"/>
+      <!-- 镜片里闪现的小萝卜 -->
+      <g id="lensCarrot">
+        <rect x="22" y="19" width="1" height="1" fill="#7FBF4F"/>
+        <rect x="22" y="20" width="1" height="1" fill="#F0913C"/>
+        <rect x="22" y="21" width="1" height="1" fill="#C96A22"/>
+      </g>
+    </g>
+    </g>
+  </g>
+</svg>
+
+<script>
+  /* ─── 站立兔图谱（同 idle 标准位）。28×28。 ─── */
+  const SPRITE = [
+    "............................",
+    "........OWWWO..OWWWO........",
+    "........OWPWO..OWPWO........",
+    "........OWPWO..OWPWO........",
+    "........OWPWO..OWPWO........",
+    "........OWPWO..OWPWO........",
+    "........OWWWO..OWWWO........",
+    "........OWWWO..OWWWO........",
+    "......OOWWWWWWWWWWWWOO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWWWWPPWWWWWWO......",
+    "......OWPWWWWWWWWWWPWO......",
+    "......OOWWWWWWWWWWWWOO......",
+    "......OOWWWWWWWWWWWWOO......",
+    "......OWWWWWWWWWWWWWWO......",
+    "......OWWWBBBBBBBBWWWO......",
+    "......OWWWBBBBBBBBWWWO......",
+    "......OWWWBBBBBBBBWWWO......",
+    "......OWWWWBBBBBBWWWWO......",
+    "......OOWWWWWWWWWWWWOO......",
+    "........OWWWO..OWWWO........",
+    "........OWWWO..OWWWO........",
+    "........OOOOO..OOOOO........",
+    "............................"
+  ];
+  const PALETTE = { O:"#5A4A3F", W:"#F5EFE4", B:"#FFFBF4", P:"#F4A7B6" };
+
+  const SVGNS = "http://www.w3.org/2000/svg";
+  const bodyG = document.getElementById("body");
+  SPRITE.forEach((row, y) => {
+    for (let x = 0; x < row.length; x++) {
+      const c = row[x];
+      if (c === "." || !PALETTE[c]) continue;
+      const r = document.createElementNS(SVGNS, "rect");
+      r.setAttribute("x", x); r.setAttribute("y", y);
+      r.setAttribute("width", 1); r.setAttribute("height", 1);
+      r.setAttribute("fill", PALETTE[c]);
+      bodyG.appendChild(r);
+    }
+  });
+</script>
+
+</body>
+</html>

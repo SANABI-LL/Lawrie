@@ -5,13 +5,13 @@
 [![Latest release](https://img.shields.io/github/v/release/SANABI-LL/Lawrie?label=release&color=F0913C)](https://github.com/SANABI-LL/Lawrie/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/SANABI-LL/Lawrie/total?label=downloads&color=7FBF4F)](https://github.com/SANABI-LL/Lawrie/releases)
 [![Code: MIT](https://img.shields.io/badge/code-MIT-blue)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-Windows-0078D6)](#怎么跑)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-0078D6)](#怎么跑)
 
 一只用 [pet-forge](https://github.com/SANABI-LL/pet-forge-2) SVG 路线做的**自定义像素风桌宠** —— 一只爱萝卜的兔子。每个状态都是一个**自包含的 `.svg.html`**（内联 SVG + CSS + JS，零依赖，双击即跑），整像素、硬边、跳帧的像素风。
 
 > 这个仓库是制作进度的存档，随时可以回来看做到哪了。
 
-**⬇️ 直接用**：到 [Releases](https://github.com/SANABI-LL/Lawrie/releases/latest) 下载 `Lawrie-*-win-x64.exe`，双击即跑（Windows）。
+**⬇️ 直接用**：到 [Releases](https://github.com/SANABI-LL/Lawrie/releases/latest) 下载——Windows 拿 `Lawrie-*-win-x64.exe` 双击即跑；macOS (Apple Silicon) 拿 `Lawrie-*-arm64.dmg` 拖进应用程序。
 
 ## 状态一览
 
@@ -28,6 +28,12 @@
     <td align="center"><img src="previews/notification.png" width="104" alt="notification"><br><sub>notification</sub></td>
     <td align="center"><img src="previews/carrying.png" width="104" alt="carrying"><br><sub>carrying</sub></td>
   </tr>
+  <tr>
+    <td align="center"><img src="previews/greeting.png" width="104" alt="greeting"><br><sub>greeting</sub></td>
+    <td align="center"><img src="previews/searching.png" width="104" alt="searching"><br><sub>searching</sub></td>
+    <td align="center"><img src="previews/compacting.png" width="104" alt="compacting"><br><sub>compacting</sub></td>
+    <td align="center"><img src="previews/chilling.png" width="104" alt="chilling"><br><sub>chilling</sub></td>
+  </tr>
 </table>
 
 <sub>静态预览（`previews/`）。想看动效：开 GitHub Pages 后进总览页，或双击任意 `rabbit-*.svg.html`。</sub>
@@ -43,9 +49,9 @@
 
 装好后**重开 Claude Code**，兔子就自动出现、跟着你干活换状态了 —— 全程不用碰任何配置文件。
 
-- 首次会自动下载挂件（约 70MB，一次性），下载完兔子就蹦出来。
+- 首次会自动下载挂件（70~90MB，一次性），下载完兔子就蹦出来打招呼。
 - 不想要了：`/plugin uninstall lawrie-pet@lawrie`，hooks 一起干净移除。
-- 目前挂件是 **Windows** 的；macOS / Linux 见下方「手动接入 / 其他平台」。
+- **Windows / macOS (Apple Silicon)** 都能自动拉起；Linux 见下方「手动接入 / 其他平台」。
 
 ## 在线预览
 
@@ -73,8 +79,12 @@
 | error | `rabbit-error-v2.svg.html` | XX 晕眼 + 金星绕头 + glitch 错位 | ✅ |
 | notification | `rabbit-notification.svg.html` | 盯人 + 两侧 ping 声波 + 闪烁大"!" + 兜里露橙头 | ✅ |
 | carrying | `rabbit-carrying.svg.html` | 团队大哥：戴墨镜 + 左拳冲天 + 右举长萝卜剑 + 嘚瑟晃动 + 墨镜扫光 | ✅ |
+| greeting | `rabbit-greeting.svg.html` | 打招呼：挥爪 + 捧萝卜敬礼 + 轻快小蹦 | ✅ |
+| searching | `rabbit-searching.svg.html` | 翻找：举放大镜贴地扫 + 镜里萝卜闪现 + 左右踱步 | ✅ |
+| compacting | `rabbit-compacting.svg.html` | 打包：压实萝卜堆 → 捆成萝卜干砖 ✨ | ✅ |
+| chilling | `rabbit-chilling.svg.html` | 摸鱼：戴耳机摇头晃脑 + 音符飘（手动彩蛋） | ✅ |
 
-**8 件套全部完成** 🎉：最小可上线集 (idle/typing/thinking/sleeping/happy) + error + notification + carrying。
+**12 件套全部完成** 🎉：8 件套基础集 + v1.1 新增 greeting / searching / compacting / chilling。
 
 > carrying 的语义最后定为「扛起重任的团队大哥」——胡萝卜是它披荆斩棘的武器，戴着墨镜嘚瑟亮相。
 
@@ -87,7 +97,7 @@
 
 ## 运行时 / 桌面挂件
 
-`runtime/widget/` 是一个自做的极简 Electron 挂件（透明置顶、原生拖动、拖角缩放、大小记忆），把上面 8 个 `.svg.html` 状态接成一只**会跟着 Claude Code 实时变状态**的桌宠。
+`runtime/widget/` 是一个自做的极简 Electron 挂件（透明置顶、原生拖动、拖角缩放、大小记忆），把上面 12 个 `.svg.html` 状态接成一只**会跟着 Claude Code 实时变状态**的桌宠。
 
 **怎么跑**：
 
@@ -98,19 +108,22 @@ npm start          # 同步状态资源并启动挂件（开发用）
 # 或 npm run dist   # 打包成桌面可执行文件
 ```
 
-> **平台说明**：预打包的 exe 和上面的 hook 拉起命令（`explorer.exe`）是 **Windows** 的。
-> **macOS / Linux** 用户可以从源码跑：`npm start` 直接看挂件（Electron 跨平台）；要接 Claude Code，把 `hooks.example.json` 里 `SessionStart` 的拉起命令换成你系统的等价物——macOS 用 `open -a "/路径/Lawrie.app" || exit 0`，Linux 直接写可执行文件路径 `/路径/lawrie &`（其余 `curl` 那几行跨平台通用，不用改）。打包到 mac/linux 需在 `runtime/widget/package.json` 的 `build.win` 旁加 `mac` / `linux` target 再 `npm run dist`。
+> **平台说明**：**Windows**（预打包 exe）和 **macOS (Apple Silicon)**（预打包 dmg/zip，`LSUIElement` 不占 Dock、跨所有 Spaces 可见）都正式支持，plugin 会自动按平台下载拉起。
+> **Linux** 用户可以从源码跑：`npm start` 直接看挂件（Electron 跨平台）；要接 Claude Code，把 `hooks.example.json` 里 `SessionStart` 的拉起命令写成可执行文件路径 `/路径/lawrie &`（其余 `curl` 那几行跨平台通用，不用改）。打包到 linux 需在 `runtime/widget/package.json` 的 `build.mac` 旁加 `linux` target 再 `npm run dist`。
 
 **实时联动原理**：挂件在 `127.0.0.1:4747` 起一个本地 HTTP 服务，`GET /<状态名>` 就把兔子切到对应状态。再通过 Claude Code 的 [hooks](https://docs.claude.com/en/docs/claude-code/hooks) 把生命周期事件映射成对这个端口的请求，于是 Claude 一边干活，兔子一边自己换表情：
 
 | Claude Code 事件 | 兔子状态 |
 |---|---|
-| SessionStart | idle（顺带没开就拉起挂件） |
+| SessionStart | greeting 打招呼（顺带没开就拉起挂件） |
 | UserPromptSubmit | thinking |
-| Pre/PostToolUse | typing |
+| PreToolUse（Grep/Glob/WebSearch/WebFetch 检索类） | searching 翻找 |
+| Pre/PostToolUse（其余工具） | typing |
 | PostToolUseFailure | error |
+| PreCompact（上下文压缩） | compacting 打包 |
 | SubagentStart / Stop | carrying / typing |
 | Notification、Stop（答完） | notification |
+| 手动 `curl 127.0.0.1:4747/chilling` | chilling 摸鱼彩蛋 🎧 |
 
 <details>
 <summary><b>手动接入 / 其他平台</b>（不用 plugin 时展开 · 非码农也能做）</summary>
@@ -118,6 +131,9 @@ npm start          # 同步状态资源并启动挂件（开发用）
 > 大多数人用上面的「一键接入」就够了。这里是不想装 plugin、或 macOS/Linux 用户的手动方案。
 
 hook 配置模板在 [`runtime/widget/hooks.example.json`](runtime/widget/hooks.example.json)。下面是把它接通的完整步骤（Windows）：
+
+> **macOS 用户**：步骤相同，只有两处不同——第 1 步改为下载 `Lawrie-*-arm64.dmg`，把 Lawrie 拖进「应用程序」；第 3 步里 `SessionStart` 的命令换成
+> `curl -s -m 1 http://127.0.0.1:4747/greeting || open -a "/Applications/Lawrie.app" || exit 0`（其余照抄）。
 
 **第 1 步：把兔子放到一个固定文件夹**
 
@@ -139,12 +155,16 @@ hook 配置模板在 [`runtime/widget/hooks.example.json`](runtime/widget/hooks.
 ```json
 {
   "hooks": {
-    "SessionStart":       [{ "matcher": "", "hooks": [{ "type": "command", "command": "curl -s -m 1 http://127.0.0.1:4747/idle || explorer.exe \"C:\\Users\\你的用户名\\Lawrie\\Lawrie.exe\" || exit 0" }] }],
+    "SessionStart":       [{ "matcher": "", "hooks": [{ "type": "command", "command": "curl -s -m 1 http://127.0.0.1:4747/greeting || explorer.exe \"C:\\Users\\你的用户名\\Lawrie\\Lawrie.exe\" || exit 0" }] }],
     "UserPromptSubmit":   [{ "matcher": "", "hooks": [{ "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/thinking || exit 0" }] }],
-    "PreToolUse":         [{ "matcher": "", "hooks": [{ "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/typing || exit 0" }] }],
+    "PreToolUse":         [
+      { "matcher": "Grep|Glob|WebSearch|WebFetch", "hooks": [{ "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/searching || exit 0" }] },
+      { "matcher": "^(?!(Grep|Glob|WebSearch|WebFetch)$).*", "hooks": [{ "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/typing || exit 0" }] }
+    ],
     "PostToolUse":        [{ "matcher": "", "hooks": [{ "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/typing || exit 0" }] }],
     "PostToolUseFailure": [{ "matcher": "", "hooks": [{ "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/error || exit 0" }] }],
     "Notification":       [{ "matcher": "", "hooks": [{ "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/notification || exit 0" }] }],
+    "PreCompact":         [{ "matcher": "", "hooks": [{ "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/compacting || exit 0" }] }],
     "SubagentStart":      [{ "matcher": "", "hooks": [{ "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/carrying || exit 0" }] }],
     "SubagentStop":       [{ "matcher": "", "hooks": [{ "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/typing || exit 0" }] }],
     "Stop":               [{ "matcher": "", "hooks": [{ "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/notification || exit 0" }] }]

@@ -8,7 +8,11 @@
       { "matcher": "", "hooks": [ { "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/thinking || exit 0" } ] }
     ],
     "PreToolUse": [
-      { "matcher": "", "hooks": [ { "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/typing || exit 0" } ] }
+      { "matcher": "Grep|Glob|WebSearch|WebFetch", "hooks": [ { "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/searching || exit 0" } ] },
+      { "matcher": "^(?!(Grep|Glob|WebSearch|WebFetch)$).*", "hooks": [ { "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/typing || exit 0" } ] }
+    ],
+    "PreCompact": [
+      { "matcher": "", "hooks": [ { "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/compacting || exit 0" } ] }
     ],
     "PostToolUse": [
       { "matcher": "", "hooks": [ { "type": "command", "command": "curl -s -m 2 http://127.0.0.1:4747/typing || exit 0" } ] }

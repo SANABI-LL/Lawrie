@@ -27,6 +27,8 @@ function createWindow() {
     webPreferences: { nodeIntegration: true, contextIsolation: false, webSecurity: false }
   });
   win.setAlwaysOnTop(true, 'screen-saver');
+  // macOS：跨所有 Spaces/全屏应用可见，桌宠才能一直陪着
+  if (process.platform === 'darwin') win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
   win.loadFile('pet.html');
 }
 
@@ -125,7 +127,11 @@ if (!app.requestSingleInstanceLock()) {
   app.quit();
 } else {
   app.on('second-instance', () => { if (win) { win.show(); win.focus(); } });
-  app.whenReady().then(() => { createWindow(); startServer(); startCursorWatch(); armSleep(); });
+  app.whenReady().then(() => {
+    // macOS：桌宠不占 Dock（打包版另有 LSUIElement 兜底，这里保证开发跑也隐藏）
+    if (process.platform === 'darwin') app.dock.hide();
+    createWindow(); startServer(); startCursorWatch(); armSleep();
+  });
   app.on('window-all-closed', () => app.quit());
   app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });
 }

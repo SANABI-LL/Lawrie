@@ -1,14 +1,14 @@
 {
   "name": "Lawrie",
   "author": "SANABI-LL",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "viewBox": 28,
   "_comment": "状态清单：state 名 -> 兔子动画文件。assetsDir 指向本地 assets/（自包含、可打包）。改了状态文件后跑 node sync-assets.js 同步。",
   "assetsDir": "assets/",
   "default": "idle",
   "_behavior": "状态行为分类的单一信息源：busy=正在干活的状态（主进程不计自动睡眠）；momentary=进入后 N ms 自动回 default 的瞬时状态。加新状态时在这里改，main.js/pet.html 自动适配。",
-  "busy": ["thinking", "typing", "carrying"],
-  "momentary": { "happy": 3500, "error": 3000 },
+  "busy": ["thinking", "typing", "carrying", "searching", "chilling"],
+  "momentary": { "happy": 3500, "error": 3000, "greeting": 3000, "compacting": 5000 },
   "states": {
     "idle":         "rabbit-idle.svg.html",
     "thinking":     "rabbit-thinking-v2.svg.html",
@@ -17,6 +17,10 @@
     "error":        "rabbit-error-v2.svg.html",
     "notification": "rabbit-notification.svg.html",
     "carrying":     "rabbit-carrying.svg.html",
-    "sleeping":     "rabbit-sleeping.svg.html"
+    "sleeping":     "rabbit-sleeping.svg.html",
+    "greeting":     "rabbit-greeting.svg.html",
+    "searching":    "rabbit-searching.svg.html",
+    "compacting":   "rabbit-compacting.svg.html",
+    "chilling":     "rabbit-chilling.svg.html"
   }
 }
